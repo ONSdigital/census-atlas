@@ -105,7 +105,7 @@ function setIndicator(indicators, code) {
 
 
 selectItem.subscribe(
-    function setSelect() {
+    function setSelectedDataset() {
         if ($selectItem){ // & selectMeta.code != $selectItem.code) {
             let code = selectCode = $selectItem.code;
             const c3 = code.slice(0, 3)
@@ -186,7 +186,7 @@ function loadData() {
             let ladChunks = ckmeans(ladVals, 5);
             dataset.lad.breaks = getBreaks(ladChunks);
 
-            dataset.ew.data = proc.ew.data;
+            dataset.englandAndWales.data = proc.englandAndWales.data;
 
             $data[$selectItem.code] = dataset;
 

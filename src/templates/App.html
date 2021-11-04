@@ -18,7 +18,7 @@
     {#if $selectData}
 
     <PanelSection  key='chart'>
-    <ColChart data={$selectData.lsoa.data} dataIndex={$selectData.lsoa.index} breaks={$selectData.lsoa.breaks} avg={$selectData.ew.data} selected={$lsoa.hovered ? $lsoa.hovered : $lsoa.selected} parent={$lad.hovered ? $selectData.lad.index[$lad.hovered].median.code
+    <ColChart data={$selectData.lsoa.data} dataIndex={$selectData.lsoa.index} breaks={$selectData.lsoa.breaks} avg={$selectData.englandAndWales.data} selected={$lsoa.hovered ? $lsoa.hovered : $lsoa.selected} parent={$lad.hovered ? $selectData.lad.index[$lad.hovered].median.code
         : $lad.highlighted ? $selectData.lad.index[$lad.highlighted].median.code : $lad.selected ? $selectData.lad.index[$lad.selected].median.code : null} siblings={$lad.selected ? $lad_dta.get($lad.selected).children : null}
         key="perc" />
 
@@ -35,10 +35,10 @@
             <div>
                 <hr style="border-top-color: #871A5B" />
                 <strong>England & Wales</strong><br />
-                <strong class="text-lrg">{$selectData.ew.data.perc.toFixed(1)}%</strong><br />
-                <small>{$selectData.ew.data.value.toLocaleString()}
+                <strong class="text-lrg">{$selectData.englandAndWales.data.perc.toFixed(1)}%</strong><br />
+                <small>{$selectData.englandAndWales.data.value.toLocaleString()}
 							of
-							{$selectData.ew.data.count.toLocaleString()}
+							{$selectData.englandAndWales.data.count.toLocaleString()}
 							{$selectItem.unit.toLowerCase()}s</small>
             </div>
             {#if $lad.hovered || $lad.highlighted || $lad.selected}

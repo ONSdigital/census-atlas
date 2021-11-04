@@ -1,5 +1,4 @@
 import { get } from "svelte/store";
-import { bbox } from "@turf/turf";
 import { ckmeans } from "simple-statistics";
 
 export async function getNomis(
@@ -186,31 +185,26 @@ export function addLadDataToDataset(dataset, lsoalookup, nomisData) {
   dataset.englandAndWales.data = proc.englandAndWales.data;
 }
 
-export function setColors(data, active, lsoalookup, ladbounds, selectData, selectItem, ladtopo, map) {
-  let newdata = JSON.parse(JSON.stringify(data[selectItem.code]));
-  if (active.lad.selected) {
-    // re-color dataset
-    newdata.lsoa.data.forEach((d) => {
-      if (lsoalookup[d.code].parent == active.lad.selected) {
-        d.fill = d.color;
-        d.selected = true;
-      } else {
-        d.fill = d.muted;
-        d.selected = false;
+export function setColors(lsoalookup, $data, $selectData, $selectItem, $lad, $lad_dta, $lsoa, $bounds) {
+  let newdata = JSON.parse(JSON.stringify($data[$selectItem.code]));
+  if ($lad.selected) {
+      // re-color dataset
+      newdata.lsoa.data.forEach(d => {
+          if (lsoalookup[d.code].parent == $lad.selected) {
+              d.fill = d.color;
+              d.selected = true;
+          } else {
+              d.fill = d.muted;
+              d.selected = false;
+          }
+      });
+      let b = $lad_dta.get($lad.selected);
+      if (!$lsoa.selected) {
+          $bounds = [b.minx, b.miny, b.maxx, b.maxy];
       }
-    });
-    // zoom to district on map
-    let geometry = ladbounds.features.find(
-      (f) => f.properties[ladtopo.code] == active.lad.selected
-    ).geometry;
-    let bounds = bbox(geometry);
-    if (!active.lsoa.selected) {
-      map.fitBounds(bounds, { padding: 20 });
-    }
   }
-  selectData = newdata;
-
-}
+  $selectData = newdata;
+  }
 
 export function updateURL(location,selectCode,active,mapLocation,history) {
   let hash = location.hash;
