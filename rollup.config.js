@@ -1,3 +1,4 @@
+// rollup.config.js
 import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -6,6 +7,8 @@ import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 
 const production = !process.env.ROLLUP_WATCH;
+const public_loc = 'public'
+
 
 function serve() {
 	let server;
@@ -28,15 +31,27 @@ function serve() {
 	};
 }
 
+// get author names
+const { exec } = require("child_process");
+var author = '';
+exec("git for-each-ref --format='%(authorname)' | sort -k5n -k2M -k3n -k4n", (error, stdout, stderr) => {
+    var set = new Set(stdout.split('\n'))
+		author = [...set].join(',')
+    console.log(`Commit Authors:\n  ${author}`);
+});
+
+
 export default {
 	input: 'src/main.js',
 	output: {
 		sourcemap: true,
 		format: 'iife',
-		name: 'app',
-		file: 'public/build/bundle.js'
+		name: 'ONSCensusAtlas',
+		authors: author,
+		file: public_loc+'/build/bundle.js'
 	},
 	plugins: [
+
 		svelte({
 			compilerOptions: {
 				hydratable: true,
@@ -65,11 +80,11 @@ export default {
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('public'),
+		!production && livereload(public_loc),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser({ output: { comments: false } })
 	],
 	watch: {
 		clearScreen: false

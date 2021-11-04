@@ -1,22 +1,6 @@
-import { feature } from "topojson-client";
-import { csvParse, autoType } from "d3-dsv";
 import { get } from "svelte/store";
 import { bbox } from "@turf/turf";
 import { ckmeans } from "simple-statistics";
-
-export async function getLsoaData(url) {
-  let response = await fetch(url);
-  let string = await response.text();
-  let data = await csvParse(string, autoType);
-  return data;
-}
-
-export async function getTopo(url, layer) {
-  let response = await fetch(url);
-  let topojson = await response.json();
-  let geojson = await feature(topojson, layer);
-  return geojson;
-}
 
 export async function getNomis(
   url,
@@ -107,7 +91,11 @@ function calculateLadPercentages(ladCode, lad, ladTemp) {
 }
 
 export function getBreaks(chunks) {
-  let breaks = [];
+	let breaks = [];
+
+	chunks.forEach(chunk => {
+		breaks.push(chunk[0]);
+	});
 
   chunks.forEach((chunk) => {
     breaks.push(chunk[0]);
