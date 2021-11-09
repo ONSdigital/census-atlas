@@ -196,6 +196,23 @@
 		}
 	}
 
+	function getTableGeoAndTotals (tableName) {
+		for (let tableColumn in data) {
+			if (tableColumn.toLowerCase().startsWith(tableName)) {
+				let output = {
+					'geography_code': [],
+					'total': []
+				}
+				for (let lsoa_row in data[tableColumn].lsoa.data) {
+					output['geography_code'].push(data[tableColumn].lsoa.data[lsoa_row].code)
+					output['total'].push(data[tableColumn].lsoa.data[lsoa_row].count)
+				}
+				return output
+			}
+		}
+		return false
+	}
+
 	function loadData() {
 		console.log("loading data...");
 		loading = true;
@@ -212,8 +229,14 @@
 			// let url = `https://bothness.github.io/census-atlas/data/lsoa/${selectMeta.code}.csv`;
 			let table = selectMeta.code.slice(0,-3).toLowerCase()
 			let col_header = `_${parseInt(selectMeta.cell)}`
-			let url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${table}?cols=geography_code,total,${col_header}`
-			getNomis(url, col_header).then((res) => {
+			let alreadyHaveGeoTotals = getTableGeoAndTotals(table)
+			let url;
+			if (alreadyHaveGeoTotals == false) {
+				url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${table}?cols=geography_code,total,${col_header}`
+			} else {
+				url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${table}?cols=${col_header}`
+			}
+			getNomis(url, col_header, alreadyHaveGeoTotals).then((res) => {
 				let dataset = {
 					lsoa: {},
 					lad: {},
@@ -262,7 +285,6 @@
 				dataset.lad.breaks = getBreaks(ladChunks);
 
 				dataset.ew.data = proc.ew.data;
-
 				data[selectItem.code] = dataset;
 				selectData = dataset;
 				console.log("data loaded from csv!");

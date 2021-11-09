@@ -15,20 +15,35 @@ export async function getTopo(url, layer) {
   return geojson;
 }
 
-export async function getNomis(url, code) {
+export async function getNomis(url, code, alreadyHaveGeoTotals) {
+	const last_lsoa = 34752
   let response = await fetch(url);
   let string = await response.text();
-	let data = await csvParse(string, (d) => {
-		if (d['geography_code'].startsWith('E01') || d['geography_code'].startsWith('W01')) {
-			return {
-				code: d['geography_code'],
-				value: +d[code],
-				count: +d['total'],
-				perc: (+d[code] / +d['total']) * 100
-			};
-		}
-	});
-  return data;
+	let data;
+	if (alreadyHaveGeoTotals == false) {
+		data = await csvParse(string, (d, i) => {
+			if (i <= last_lsoa) {
+				return {
+					code: d['geography_code'],
+					value: +d[code],
+					count: +d['total'],
+					perc: (+d[code] / +d['total']) * 100
+				};
+			}
+		});
+	} else {
+		data = await csvParse(string, (d, i) => {
+			if (i <= last_lsoa) {
+				return {
+					code: alreadyHaveGeoTotals.geography_code[i],
+					value: +d[code],
+					count: alreadyHaveGeoTotals.total[i],
+					perc: (+d[code] / alreadyHaveGeoTotals.total[i]) * 100
+				};
+			}
+		});
+	}
+	return data;
 }
 
 export function processData(data, lookup) {
