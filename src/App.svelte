@@ -9,10 +9,6 @@
 </script>
 
 <Router url="{url}">
-	<nav>
-	  <Link to="/">Census Atlas</Link>
-	  <Link to="design-system">Design System</Link>
-	</nav>
 	<div>
 	  <Route path="design-system" component="{DesignSystemApp}" />
 	  <Route path="/"><CensusAtlas /></Route>

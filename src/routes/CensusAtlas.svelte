@@ -5,7 +5,6 @@
     selectedCategory,
   } from "../stores.js";
   import { onMount } from "svelte";
-  // import { bbox } from "@turf/turf";
   import Panel from "../Panel.svelte";
   import Group from "../Group.svelte";
   import MapSource from "../MapSource.svelte";
@@ -14,261 +13,255 @@
   import Loader from "../ui/Loader.svelte";
   import Select from "../ui/Select.svelte";
   import {
-    getLsoaData,
     getNomis,
-    getTopo,
     storeNewCategoryAndTotals,
     populateColors,
     addLadDataToDataset,
     setColors,
     updateURL,
-    // replaceURL,
   } from "../utils.js";
   import MapComponent from "../MapComponent.svelte";
   import { get } from "svelte/store";
   import LocalDataService from "../dataService";
   import { json } from "d3-fetch";
  
-  import {bounds,lad_dta,get_data} from '../stores.js';
-  // CONFIG
-  // const apiurl = "https://www.nomisweb.co.uk/api/v01/dataset/";
-  // const apikey = "0x3cfb19ead752b37bb90da0eb3a0fe78baa9fa055";
+  import {lad_dta,get_data} from '../stores.js';
+
+    import {
+        mapDoesNotMatchSelection,
+        selectedData,
+        selectedCensusCategory,
+        activeOnMapCensusCategory,
+        updateActiveOnMapCensusCategory,
+        updateSelectedData,
+        updateSelectedCensusCategory
+    } from "../stores/state";
 
 
+    const geography = "TYPE298";
+    const mapstyle =
+        "https://bothness.github.io/ons-basemaps/data/style-omt.json";
+    const tabledata =
+        "https://bothness.github.io/census-atlas/data/indicators.json";
+    const ladtopo = {
+        url: "https://bothness.github.io/census-atlas/data/lad_boundaries_2020.json",
+        layer: "LA2020EW",
+        code: "AREACD",
+        name: "AREANM",
+    };
+    const lsoabldg = {
+        url: "https://cdn.ons.gov.uk/maptiles/buildings/v1/{z}/{x}/{y}.pbf",
+        layer: "buildings",
+        code: "lsoa11cd",
+    };
+    const lsoabounds = {
+        url: "https://cdn.ons.gov.uk/maptiles/administrative/lsoa/v2/boundaries/{z}/{x}/{y}.pbf",
+        layer: "lsoa",
+        code: "areacd",
+    };
+    const ladvector = {
+        url: "https://cdn.ons.gov.uk/maptiles/administrative/authorities/v1/boundaries/{z}/{x}/{y}.pbf",
+        layer: "authority",
+        code: "areacd",
+    };
+    const lsoadata =
+        "https://bothness.github.io/census-atlas/data/lsoa2011_lad2020.csv";
+    const colors = {
+        base: ["#d5f690", "#5bc4b1", "#2e9daa", "#0079a2", "#005583", "#cccccc"],
+        muted: ["#f5fce2", "#d7ede8", "#cbe2e5", "#c2d7e3", "#bdccd9", "#f0f0f0"],
+    };
 
-  const geography = "TYPE298";
-  const mapstyle =
-    "https://bothness.github.io/ons-basemaps/data/style-omt.json";
-  const tabledata =
-    "https://bothness.github.io/census-atlas/data/indicators.json";
-  const ladtopo = {
-    url: "https://bothness.github.io/census-atlas/data/lad_boundaries_2020.json",
-    layer: "LA2020EW",
-    code: "AREACD",
-    name: "AREANM",
-  };
-  const lsoabldg = {
-    url: "https://cdn.ons.gov.uk/maptiles/buildings/v1/{z}/{x}/{y}.pbf",
-    layer: "buildings",
-    code: "lsoa11cd",
-  };
-  const lsoabounds = {
-    url: "https://cdn.ons.gov.uk/maptiles/administrative/lsoa/v2/boundaries/{z}/{x}/{y}.pbf",
-    layer: "lsoa",
-    code: "areacd",
-  };
-  const ladvector = {
-    url: "https://cdn.ons.gov.uk/maptiles/administrative/authorities/v1/boundaries/{z}/{x}/{y}.pbf",
-    layer: "authority",
-    code: "areacd",
-  };
-  const lsoadata =
-    "https://bothness.github.io/census-atlas/data/lsoa2011_lad2020.csv";
-  const colors = {
-    base: ["#d5f690", "#5bc4b1", "#2e9daa", "#0079a2", "#005583", "#cccccc"],
-    muted: ["#f5fce2", "#d7ede8", "#cbe2e5", "#c2d7e3", "#bdccd9", "#f0f0f0"],
-  };
+    export const boundurl = "https://raw.githubusercontent.com/wolfiex/TopoStat/main/ladb_20.csv";
+    export const lsoaurl = "https://raw.githubusercontent.com/wolfiex/TopoStat/main/lsoa11_20.json";
 
-  export const boundurl = "https://raw.githubusercontent.com/wolfiex/TopoStat/main/ladb_20.csv";
-export const lsoaurl ="https://raw.githubusercontent.com/wolfiex/TopoStat/main/lsoa11_20.json";
+    const DEFAULT_CENSUS_CATEGORY = 'QS119EW005'
+    let initialCensusCategoryCode = DEFAULT_CENSUS_CATEGORY
 
-  
+    // OBJECTS
+    let map = null;
 
-  // OBJECTS
-  let map = null;
+    // DATA
+    let indicators;
+    let ladbounds;
+    let ladlookup;
+    let lsoalookup;
+    let data = {};
+    let active = {
+        lsoa: {
+            selected: null,
+            geometry: null,
+            hovered: null,
+        },
+        lad: {
+            selected: null,
+            selectedPrev: null,
+            hovered: null,
+            highlighted: null,
+        },
+    };
 
-  // DATA
-  let indicators;
-  let ladbounds;
-  let ladlookup;
-  let lsoalookup;
-  let data = {};
-  let active = {
-    lsoa: {
-      selected: null,
-      geometry: null,
-      hovered: null,
-    },
-    lad: {
-      selected: null,
-      selectedPrev: null,
-      hovered: null,
-      highlighted: null,
-    },
-  };
+    // STATE
+    let mapLocation = null;
 
-  // STATE
-  let selectCode = "QS119EW005";
-  let mapLocation = null;
+    let loading = true;
 
-  let selectItem;
-  let selectMeta;
-  let selectData;
-  let loading = true;
+    let mapLoaded = false;
+    let mapZoom = null;
 
-  let mapLoaded = false;
-  let mapZoom = null;
+    const localDataService = new LocalDataService();
 
-  const localDataService = new LocalDataService();
-
-  function setIndicator(indicators, code) {
-        indicators.forEach(indicator => {
-            if (indicator.code && indicator.code == code) {
-                selectItem = indicator;
+    function setCensusCategory(indicators, code) {
+        for(let indicator in indicators) {
+            if (indicator.code && indicator.code === code) {
+                updateSelectedCensusCategory(indicator)
+                return
             } else if (indicator.children) {
-                setIndicator(indicator.children, code);
+                setCensusCategory(indicator.children, code);
             }
-        });
+        }
     }
 
-  async function initialise() {
+    async function initialise() {
+        var location = await get_data(boundurl)
 
-    var location = await get_data(boundurl)
+        // no need to be blocking
+        json(tabledata).then(jsn => {
+            indicators = jsn;
+            setCensusCategory(indicators, getCategoryCode());
 
-    
+            if (!get(selectedCensusCategory)) {
+                updateSelectedCensusCategory(indicators[0].children[0].children[0]);
+            }
 
-    // no need to be blocking
-    json(tabledata).then(jsn => {
-        indicators = jsn;
-        setIndicator(indicators, selectCode);
+            json(lsoaurl).then(data => {
+                lsoalookup = data;
+            });
+        })
 
-        if (!selectItem) {
-            selectItem = indicators[0].children[0].children[0];
-        }
-
-        setIndicator(indicators, selectCode);
-  
-
-
-    json(lsoaurl).then(data => {
-        lsoalookup = data;
-    });
-            
-    
-
-    
-    })
-
-    console.warn(location,$lad_dta)
     mapLocation = {
         zoom: 11,
         lon: +location.lon,
         lat: +location.lat
     };
     changeURL()
-    // replaceURL(selectCode,active,mapLocation,history);
-    // if (map) map.flyTo(mapLocation);
-    
   }
 
-  
 
-  // FUNCTIONS
+    // FUNCTIONS
 
-
-  function setSelectedDataset() {
-    if (!(selectMeta && selectItem && selectMeta.code == selectItem.code)) {
-      let code = selectItem.code;
-      let group = indicators.find((d) => d.code == code.slice(0, 3));
-      let table = group.children.find((d) => d.code == code.slice(0, 7));
-      let cell = +code.slice(7, 10);
-
-      selectCode = code;
-
-      selectMeta = {
-        code: selectItem.code,
-        group: group,
-        table: table,
-        cell: cell,
-      };
-      loadData();
-      updateURL(location,selectCode,active,mapLocation,history);
+    function getCategoryCode() {
+        if($selectedCategory) {
+            return $selectedCategory.code
+        } else {
+            return initialCensusCategoryCode
+        }
     }
-  }
 
-  async function loadData() {
-    loading = true;
-    // let url = `${apiurl}${selectMeta.table.nomis}${selectMeta.cell}&geography=${geography}&uid=${apikey}`;
-    let url = `https://bothness.github.io/census-atlas/data/lsoa/${selectMeta.code}.csv`;
-    let currentCategoryCode = get(selectedCategory);
-    if (currentCategoryCode != selectMeta.code) {
-      storeNewCategoryAndTotals(
-        selectedCategory,
-        selectedCategoryTotals,
-        selectMeta,
-        localDataService,
-        url
-      );
-    }
-    let nomisData = await getNomis(
-      url,
-      localDataService,
-      geographicCodes,
-      selectedCategoryTotals,
-      selectMeta.cell
-    );
-    let dataset = populateColors(nomisData, colors);
-    addLadDataToDataset(dataset, lsoalookup, nomisData);
-    data[selectItem.code] = dataset;
-    selectData = dataset;
-    if (active.lad.selected) {
-      setColors(data, active, lsoalookup, ladbounds, selectData, selectItem, ladtopo, map,$lad_dta);
-    }
-    loading = false;
-  }
+    function setSelectedDataset() {
 
-  function doSelect() {
-    if (active.lad.selected != active.lad.selectedPrev) {
-      active.lad.selectedPrev = active.lad.selected;
-      if (
-        active.lad.selected &&
-        active.lsoa.selected &&
-        // !ladlookup[active.lad.selected].children.includes(active.lsoa.selected)
-        !$lad_dta
-                .get(active.lad.selected)
-                .children.includes(active.lsoa.selected)
-      ) {
-        active.lsoa.selected = null;
-      }
-      setColors(data, active, lsoalookup, ladbounds, selectData, selectItem, ladtopo, map,$lad_dta);
-      updateURL(window.location,selectCode,active,mapLocation,history);
-    }
-  }
+        if (mapDoesNotMatchSelection()) {
+            if ($selectedCensusCategory) {
+                let code = $selectedCensusCategory.code;
+                let group = indicators.find((d) => d.code == code.slice(0, 3));
+                let table = group.children.find((d) => d.code == code.slice(0, 7));
+                let cell = +code.slice(7, 10);
 
-  function getSib(type, diff) {
-    if (type == "lad") {
-      let index =
-        selectData.lad.data.findIndex((d) => d.AREACD == active.lad.selected) +
-        diff;
-      if (index >= 0 && index < selectData.lad.data.length) {
-        active.lsoa.selected = null;
-        active.lad.selected = selectData.lad.data[index].AREACD;
-      }
-    } else if (type == "lsoa") {
-      let filtered = selectData.lsoa.data.filter((d) =>
-        // ladlookup[active.lad.selected].children.includes(d.code)
-        $lad_dta.get(active.lad.selected).children.includes(d.AREACD)
-      );
-      let index =
-        filtered.findIndex((d) => d.code == active.lsoa.selected) + diff;
-      if (index >= 0 && index < filtered.length) {
-        active.lsoa.selected = filtered[index].AREACD;
+                updateActiveOnMapCensusCategory({
+                    code: code,
+                    group: group,
+                    table: table,
+                    cell: cell,
+                })
 
-        // Fit to parent LAD
-        let b = $lad_dta.get(active.lad.selected);
-        map.fitBounds([b.minx, b.miny, b.maxx, b.maxy], { padding: 20 });
-      }
+                loadData();
+                updateURL(location, getCategoryCode(), active, mapLocation, history);
+            }
+        }
     }
-  }
+
+    async function loadData() {
+        loading = true;
+        let url = `https://bothness.github.io/census-atlas/data/lsoa/${$activeOnMapCensusCategory.code}.csv`;
+        let currentCategoryCode = get(selectedCategory);
+        if (currentCategoryCode !== $activeOnMapCensusCategory.code) {
+            storeNewCategoryAndTotals(
+                selectedCategory,
+                selectedCategoryTotals,
+                $activeOnMapCensusCategory,
+                localDataService,
+                url
+            );
+        }
+        let nomisData = await getNomis(
+            url,
+            localDataService,
+            geographicCodes,
+            selectedCategoryTotals,
+            $activeOnMapCensusCategory.cell
+        );
+        let dataset = populateColors(nomisData, colors);
+
+        addLadDataToDataset(dataset, lsoalookup, nomisData);
+        data[$selectedCensusCategory.code] = dataset;
+        updateSelectedData(dataset);
+
+        if (active.lad.selected) {
+            setColors(data, active, lsoalookup, ladbounds, get(selectedData), get(selectedCensusCategory), ladtopo, map, $lad_dta);
+        }
+        loading = false;
+    }
+
+    function doSelect() {
+        if (active.lad.selected !== active.lad.selectedPrev) {
+            active.lad.selectedPrev = active.lad.selected;
+            if (
+                active.lad.selected &&
+                active.lsoa.selected &&
+                !$lad_dta
+                    .get(active.lad.selected)
+                    .children.includes(active.lsoa.selected)
+            ) {
+                active.lsoa.selected = null;
+            }
+            setColors(data, active, lsoalookup, ladbounds, $selectedData, $selectedCensusCategory, ladtopo, map, $lad_dta);
+            updateURL(window.location, $selectedCensusCategory.code, active, mapLocation, history);
+        }
+    }
+
+    function getSib(type, diff) {
+        if (type == "lad") {
+            let index =
+                $selectedData.lad.data.findIndex((d) => d.AREACD == active.lad.selected) +
+                diff;
+            if (index >= 0 && index < $selectedData.lad.data.length) {
+                active.lsoa.selected = null;
+                active.lad.selected = $selectedData.lad.data[index].AREACD;
+            }
+        } else if (type == "lsoa") {
+            let filtered = $selectedData.lsoa.data.filter((d) =>
+                // ladlookup[active.lad.selected].children.includes(d.code)
+                $lad_dta.get(active.lad.selected).children.includes(d.AREACD)
+            );
+            let index =
+                filtered.findIndex((d) => d.code == active.lsoa.selected) + diff;
+            if (index >= 0 && index < filtered.length) {
+                active.lsoa.selected = filtered[index].AREACD;
+
+                // Fit to parent LAD
+                let b = $lad_dta.get(active.lad.selected);
+                map.fitBounds([b.minx, b.miny, b.maxx, b.maxy], {padding: 20});
+            }
+        }
+    }
 
   // CODE
   // Update state based on URL
   console.warn(window.location.hash);
-  let hash = location.hash == "" ? "" : location.hash.split("/");
-  if (hash.length == 5) {
-    selectCode = hash[1];
-    active.lad.selected = hash[2] != "" ? hash[2] : "";
-    active.lsoa.selected = hash[3] != "" ? hash[3] : "";
+  let hash = location.hash === "" ? "" : location.hash.split("/");
+  if (hash.length === 5) {
+      initialCensusCategoryCode = hash[1];
+    active.lad.selected = hash[2] !== "" ? hash[2] : "";
+    active.lsoa.selected = hash[3] !== "" ? hash[3] : "";
     let zxy = hash[4].split(",");
     mapLocation = {
       zoom: zxy[0],
@@ -283,41 +276,14 @@ export const lsoaurl ="https://raw.githubusercontent.com/wolfiex/TopoStat/main/l
   
 
   function changeURL() {
-    let hash = `#/${selectCode||''}/${active.lad.selected ? active.lad.selected : ""}/${active.lsoa.selected ? active.lsoa.selected : ""}/${mapLocation.zoom},${mapLocation.lon},${mapLocation.lat}`;
+    let hash = `#/${getCategoryCode()||''}/${active.lad.selected ? active.lad.selected : ""}/${active.lsoa.selected ? active.lsoa.selected : ""}/${mapLocation.zoom},${mapLocation.lon},${mapLocation.lat}`;
     if (hash != window.location.hash) {
         history.pushState(undefined, undefined, hash);
     }
 }
-  // function changeURL() => {
-  //   let hash = location.hash == "" ? "" : location.hash.split("/");
 
-  //   if (selectCode != hash[1]) {
-  //     selectCode = hash[1];
-  //     setIndicator(indicators, selectCode);
-  //   }
-  //   if (active.lsoa.selected != hash[3]) {
-  //     active.lsoa.selected = hash[3] != "" ? hash[3] : null;
-  //   } else if (active.lad.selected != hash[2]) {
-  //     active.lad.selected = hash[2] != "" ? hash[2] : null;
-  //   }
-  //   if (
-  //     `${mapLocation.zoom},${mapLocation.lon},${mapLocation.lat}` != hash[4]
-  //   ) {
-  //     let loc = hash[4].split(",");
-  //     mapLocation = { zoom: loc[0], center: [loc[1], loc[2]] };
-  //     map.jumpTo(mapLocation);
-  //   }
-  // };
-
-
-// $: indicators, console.warn('indicator change',indicators);
-// $: selectItem, console.warn('selectItem',selectItem);
-// $: selectData, console.warn('selectData',selectData);
-$: ladvector, console.warn('ladvector',ladvector);
-$: active.lad, console.warn('active.lad',active.lad);
-
-  $: selectItem && setSelectedDataset(); // Update meta when selection updates
-  $: active.lad.highlighted =
+$: $selectedCensusCategory && setSelectedDataset(); // Update meta when selection updates
+$: active.lad.highlighted =
     lsoalookup && active.lsoa.hovered
       ? lsoalookup[active.lsoa.hovered].parent
       : null;
@@ -325,192 +291,192 @@ $: active.lad, console.warn('active.lad',active.lad);
     lsoalookup && active.lsoa.selected
       ? lsoalookup[active.lsoa.selected].parent
       : active.lad.selected;
-  $: data[selectCode] &&
+  $: data[getCategoryCode()] &&
     (active.lad.selected || active.lad.selected == null) &&
     doSelect();
 
-  $: if (!mapLoaded && map) {
-    mapLoaded = true;
+    $: if (!mapLoaded && map) {
+        mapLoaded = true;
 
-    map.on("moveend", () => {
-      let center = map.getCenter();
-      mapLocation = {
-        zoom: map.getZoom().toFixed(0),
-        lon: center.lng.toFixed(5),
-        lat: center.lat.toFixed(5),
-      };
-      changeURL()
-      // replaceURL(selectCode,active,mapLocation,history);
-    });
-  }
+        map.on("moveend", () => {
+            let center = map.getCenter();
+            mapLocation = {
+                zoom: map.getZoom().toFixed(0),
+                lon: center.lng.toFixed(5),
+                lat: center.lat.toFixed(5),
+            };
+            changeURL()
+            // replaceURL(selectCode,active,mapLocation,history);
+        });
+    }
 
- 
-onMount(async () => await initialise());
+
+    onMount(async () => await initialise());
 
 </script>
 
 {#if loading}
-  <Loader
-    height="100vh"
-    width="100vw"
-    position="fixed"
-    bgcolor="rgba(255, 255, 255, 0.7)"
-  />
+    <Loader
+            height="100vh"
+            width="100vw"
+            position="fixed"
+            bgcolor="rgba(255, 255, 255, 0.7)"
+    />
 {/if}
 
 <Panel>
-  <h1>2011 Census Atlas Demo</h1>
-  {#if indicators && selectItem}
-    {#if selectData}
-      <ColChart
-        data={selectData.lsoa.data}
-        dataIndex={selectData.lsoa.index}
-        breaks={selectData.lsoa.breaks}
-        avg={selectData.englandAndWales.data}
-        selected={active.lsoa.hovered
+    <h1>2011 Census Atlas Demo</h1>
+    {#if indicators && $selectedCensusCategory}
+        {#if $selectedData}
+            <ColChart
+                    data={$selectedData.lsoa.data}
+                    dataIndex={$selectedData.lsoa.index}
+                    breaks={$selectedData.lsoa.breaks}
+                    avg={$selectedData.englandAndWales.data}
+                    selected={active.lsoa.hovered
           ? active.lsoa.hovered
           : active.lsoa.selected}
-        parent={active.lad.hovered
-          ? selectData.lad.index[active.lad.hovered].median.code
+                    parent={active.lad.hovered
+          ? $selectedData.lad.index[active.lad.hovered].median.code
           : active.lad.highlighted
-          ? selectData.lad.index[active.lad.highlighted].median.code
+          ? $selectedData.lad.index[active.lad.highlighted].median.code
           : active.lad.selected
-          ? selectData.lad.index[active.lad.selected].median.code
+          ? $selectedData.lad.index[active.lad.selected].median.code
           : null}
-        siblings={active.lad.selected
+                    siblings={active.lad.selected
           ? $lad_dta.get(active.lad.selected).children
           : null}
-        key="perc"
-      />
-    {/if}
-    <div id="infobox">
-      {selectMeta.table.name}
-      <small>({selectMeta.table.code})</small><br />
-      <strong class="text-med">{selectItem.name}</strong>
-      <div class="grid">
-        {#if selectData}
-          <div>
-            <hr style="border-top-color: #871A5B" />
-            <strong>England & Wales</strong><br />
-            <strong class="text-lrg"
-              >{selectData.englandAndWales.data.perc.toFixed(1)}%</strong
-            ><br />
-            <small
-              >{selectData.englandAndWales.data.value.toLocaleString()}
-              of
-              {selectData.englandAndWales.data.count.toLocaleString()}
-              {selectItem.unit.toLowerCase()}s</small
-            >
-          </div>
-          {#if active.lad.hovered || active.lad.highlighted || active.lad.selected}
-            <div>
-              <hr style="border-top-color: #27A0CC" />
-              <strong
-                >{active.lad.hovered
-                  ? $lad_dta.get(active.lad.hovered).name
-                  : active.lad.highlighted
-                  ? $lad_dta.get(active.lad.highlighted).name
-                  : $lad_dta.get(active.lad.selected).name}</strong
-              ><br />
-              <strong class="text-lrg">
-                {#if active.lad.selected}<img
-                    src="./icons/chevron-left.svg"
-                    class="next"
-                    on:click={() => getSib("lad", -1)}
-                  />{/if}
-                {active.lad.hovered
-                  ? selectData.lad.index[active.lad.hovered].perc.toFixed(1)
-                  : active.lad.highlighted
-                  ? selectData.lad.index[active.lad.highlighted].perc.toFixed(1)
-                  : selectData.lad.index[active.lad.selected].perc.toFixed(1)}%
-                {#if active.lad.selected}<img
-                    src="./icons/chevron-right.svg"
-                    class="next"
-                    on:click={() => getSib("lad", 1)}
-                  />{/if}
-              </strong><br />
-              <small
-                >{active.lad.hovered
-                  ? selectData.lad.index[
-                      active.lad.hovered
-                    ].value.toLocaleString()
-                  : active.lad.highlighted
-                  ? selectData.lad.index[
-                      active.lad.highlighted
-                    ].value.toLocaleString()
-                  : selectData.lad.index[
-                      active.lad.selected
-                    ].value.toLocaleString()}
-                of
-                {active.lad.hovered
-                  ? selectData.lad.index[
-                      active.lad.hovered
-                    ].count.toLocaleString()
-                  : active.lad.highlighted
-                  ? selectData.lad.index[
-                      active.lad.highlighted
-                    ].count.toLocaleString()
-                  : selectData.lad.index[
-                      active.lad.selected
-                    ].count.toLocaleString()}
-                {selectItem.unit.toLowerCase()}s</small
-              >
-            </div>
-          {:else}
-            <div />
-          {/if}
-          {#if active.lsoa.hovered || active.lsoa.selected}
-            <div>
-              <hr style="border-top-color: #000000" />
-              <strong
-                >{active.lad.hovered
-                  ? $lad_dta.get(active.lad.hovered).name
-                  : active.lad.highlighted
-                  ? $lad_dta.get(active.lad.highlighted).name
-                  : $lad_dta.get(active.lad.selected).name}</strong
-              ><br />
-              <strong class="text-lrg">
-                {#if active.lsoa.selected}<img
-                    src="./icons/chevron-left.svg"
-                    class="next"
-                    on:click={() => getSib("lsoa", -1)}
-                  />{/if}
-                {active.lsoa.hovered
-                  ? selectData.lsoa.index[active.lsoa.hovered].perc.toFixed(1)
-                  : selectData.lsoa.index[active.lsoa.selected].perc.toFixed(
-                      1
-                    )}%
-                {#if active.lsoa.selected}<img
-                    src="./icons/chevron-right.svg"
-                    class="next"
-                    on:click={() => getSib("lsoa", 1)}
-                  />{/if}
-              </strong><br />
-              <small
-                >{active.lsoa.hovered
-                  ? selectData.lsoa.index[
-                      active.lsoa.hovered
-                    ].value.toLocaleString()
-                  : selectData.lsoa.index[
-                      active.lsoa.selected
-                    ].value.toLocaleString()}
-                of
-                {active.lsoa.hovered
-                  ? selectData.lsoa.index[
-                      active.lsoa.hovered
-                    ].count.toLocaleString()
-                  : selectData.lsoa.index[
-                      active.lsoa.selected
-                    ].count.toLocaleString()}
-                {selectItem.unit.toLowerCase()}s</small
-              >
-            </div>
-          {:else}
-            <div />
-          {/if}
+                    key="perc"
+            />
         {/if}
-      </div>
-    </div>
+        <div id="infobox">
+            {$activeOnMapCensusCategory.table.name}
+            <small>({$activeOnMapCensusCategory.table.code})</small><br/>
+            <strong class="text-med">{$selectedCensusCategory.name}</strong>
+            <div class="grid">
+                {#if $selectedData}
+                    <div>
+                        <hr style="border-top-color: #871A5B"/>
+                        <strong>England & Wales</strong><br/>
+                        <strong class="text-lrg"
+                        >{$selectedData.englandAndWales.data.perc.toFixed(1)}%</strong
+                        ><br/>
+                        <small
+                        >{$selectedData.englandAndWales.data.value.toLocaleString()}
+                            of
+                            {$selectedData.englandAndWales.data.count.toLocaleString()}
+                            {$selectedCensusCategory.unit.toLowerCase()}s</small
+                        >
+                    </div>
+                    {#if active.lad.hovered || active.lad.highlighted || active.lad.selected}
+                        <div>
+                            <hr style="border-top-color: #27A0CC"/>
+                            <strong
+                            >{active.lad.hovered
+                                ? $lad_dta.get(active.lad.hovered).name
+                                : active.lad.highlighted
+                                    ? $lad_dta.get(active.lad.highlighted).name
+                                    : $lad_dta.get(active.lad.selected).name}</strong
+                            ><br/>
+                            <strong class="text-lrg">
+                                {#if active.lad.selected}<img
+                                        src="./icons/chevron-left.svg"
+                                        class="next"
+                                        on:click={() => getSib("lad", -1)}
+                                />{/if}
+                                {active.lad.hovered
+                                    ? $selectedData.lad.index[active.lad.hovered].perc.toFixed(1)
+                                    : active.lad.highlighted
+                                        ? $selectedData.lad.index[active.lad.highlighted].perc.toFixed(1)
+                                        : $selectedData.lad.index[active.lad.selected].perc.toFixed(1)}%
+                                {#if active.lad.selected}<img
+                                        src="./icons/chevron-right.svg"
+                                        class="next"
+                                        on:click={() => getSib("lad", 1)}
+                                />{/if}
+                            </strong><br/>
+                            <small
+                            >{active.lad.hovered
+                                ? $selectedData.lad.index[
+                                    active.lad.hovered
+                                    ].value.toLocaleString()
+                                : active.lad.highlighted
+                                    ? $selectedData.lad.index[
+                                        active.lad.highlighted
+                                        ].value.toLocaleString()
+                                    : $selectedData.lad.index[
+                                        active.lad.selected
+                                        ].value.toLocaleString()}
+                                of
+                                {active.lad.hovered
+                                    ? $selectedData.lad.index[
+                                        active.lad.hovered
+                                        ].count.toLocaleString()
+                                    : active.lad.highlighted
+                                        ? $selectedData.lad.index[
+                                            active.lad.highlighted
+                                            ].count.toLocaleString()
+                                        : $selectedData.lad.index[
+                                            active.lad.selected
+                                            ].count.toLocaleString()}
+                                {$selectedCensusCategory.unit.toLowerCase()}s</small
+                            >
+                        </div>
+                    {:else}
+                        <div/>
+                    {/if}
+                    {#if active.lsoa.hovered || active.lsoa.selected}
+                        <div>
+                            <hr style="border-top-color: #000000"/>
+                            <strong
+                            >{active.lad.hovered
+                                ? $lad_dta.get(active.lad.hovered).name
+                                : active.lad.highlighted
+                                    ? $lad_dta.get(active.lad.highlighted).name
+                                    : $lad_dta.get(active.lad.selected).name}</strong
+                            ><br/>
+                            <strong class="text-lrg">
+                                {#if active.lsoa.selected}<img
+                                        src="./icons/chevron-left.svg"
+                                        class="next"
+                                        on:click={() => getSib("lsoa", -1)}
+                                />{/if}
+                                {active.lsoa.hovered
+                                    ? $selectedData.lsoa.index[active.lsoa.hovered].perc.toFixed(1)
+                                    : $selectedData.lsoa.index[active.lsoa.selected].perc.toFixed(
+                                        1
+                                    )}%
+                                {#if active.lsoa.selected}<img
+                                        src="./icons/chevron-right.svg"
+                                        class="next"
+                                        on:click={() => getSib("lsoa", 1)}
+                                />{/if}
+                            </strong><br/>
+                            <small
+                            >{active.lsoa.hovered
+                                ? $selectedData.lsoa.index[
+                                    active.lsoa.hovered
+                                    ].value.toLocaleString()
+                                : $selectedData.lsoa.index[
+                                    active.lsoa.selected
+                                    ].value.toLocaleString()}
+                                of
+                                {active.lsoa.hovered
+                                    ? $selectedData.lsoa.index[
+                                        active.lsoa.hovered
+                                        ].count.toLocaleString()
+                                    : $selectedData.lsoa.index[
+                                        active.lsoa.selected
+                                        ].count.toLocaleString()}
+                                {$selectedCensusCategory.unit.toLowerCase()}s</small
+                            >
+                        </div>
+                    {:else}
+                        <div/>
+                    {/if}
+                {/if}
+            </div>
+        </div>
 
     {#if $lad_dta}
       <Select
@@ -524,7 +490,7 @@ onMount(async () => await initialise());
 
     <Group
       props={{ name: "2011 Census Tables", children: indicators.slice(0, 8) }}
-      bind:selected={selectItem}
+      bind:selected={$selectedCensusCategory}
       expanded
     />
   {/if}
@@ -539,7 +505,7 @@ onMount(async () => await initialise());
     bind:zoom={mapZoom}
     location={mapLocation}
   >
-    {#if selectData}
+    {#if $selectedData}
       <MapSource
         id="lsoa"
         type="vector"
@@ -552,7 +518,7 @@ onMount(async () => await initialise());
           id="lsoa"
           source="lsoa"
           sourceLayer={lsoabldg.layer}
-          data={selectData}
+          data={$selectedData}
           type="fill"
           paint={{
             "fill-color": [
@@ -609,26 +575,26 @@ onMount(async () => await initialise());
               0,
             ],
           }}
-        />
-      </MapSource>
-    {/if}
-    {#if ladbounds}
-      <MapSource
-        id="lad"
-        type="vector"
-        url={ladvector.url}
-        layer={ladvector.layer}
-        promoteId={ladvector.code}
-      >
-        <MapLayer
-          id="lad"
-          source="lad"
-          sourceLayer={ladvector.layer}
-          type="line"
-          highlight={true}
-          highlighted={active.lad.highlighted}
-          filter={["all", ["==", "lower", "true"], ["in", "country", "E", "W"]]}
-          paint={{
+                />
+            </MapSource>
+        {/if}
+        {#if ladbounds}
+            <MapSource
+                    id="lad"
+                    type="vector"
+                    url={ladvector.url}
+                    layer={ladvector.layer}
+                    promoteId={ladvector.code}
+            >
+                <MapLayer
+                        id="lad"
+                        source="lad"
+                        sourceLayer={ladvector.layer}
+                        type="line"
+                        highlight={true}
+                        highlighted={active.lad.highlighted}
+                        filter={["all", ["==", "lower", "true"], ["in", "country", "E", "W"]]}
+                        paint={{
             "line-color": [
               "case",
               ["==", ["feature-state", "selected"], true],
@@ -650,61 +616,68 @@ onMount(async () => await initialise());
               0.75,
             ],
           }}
-          order="place_other"
-        />
-        <MapLayer
-          id="lad-fill"
-          source="lad"
-          sourceLayer={ladvector.layer}
-          type="fill"
-          filter={["all", ["==", "lower", "true"], ["in", "country", "E", "W"]]}
-          paint={{ "fill-color": "rgba(255, 255, 255, 0)" }}
-          hover={true}
-          bind:hovered={active.lad.hovered}
-          click={true}
-          bind:selected={active.lad.selected}
-          maxzoom={8.99}
-          on:select={() => (active.lsoa.selected = null)}
-        />
-      </MapSource>
-    {/if}
-  </MapComponent>
+                        order="place_other"
+                />
+                <MapLayer
+                        id="lad-fill"
+                        source="lad"
+                        sourceLayer={ladvector.layer}
+                        type="fill"
+                        filter={["all", ["==", "lower", "true"], ["in", "country", "E", "W"]]}
+                        paint={{ "fill-color": "rgba(255, 255, 255, 0)" }}
+                        hover={true}
+                        bind:hovered={active.lad.hovered}
+                        click={true}
+                        bind:selected={active.lad.selected}
+                        maxzoom={8.99}
+                        on:select={() => (active.lsoa.selected = null)}
+                />
+            </MapSource>
+        {/if}
+    </MapComponent>
 {/if}
 
 <style>
-  :global(body) {
-    margin: 0;
-    padding: 0;
-  }
-  h1 {
-    margin-top: 0;
-  }
-  hr {
-    border: none;
-    border-top: 3px solid grey;
-  }
-  #infobox {
-    min-height: 160px;
-    padding-bottom: 18px;
-  }
-  .text-med {
-    font-size: 1.5em;
-    font-weight: bold;
-  }
-  .text-lrg {
-    font-size: 2em;
-    font-weight: bold;
-  }
-  .grid {
-    display: grid;
-    grid-gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    justify-items: stretch;
-    width: 100%;
-    margin: 0;
-  }
-  .next {
-    height: 24px;
-    cursor: pointer;
-  }
+    :global(body) {
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        margin-top: 0;
+    }
+
+    hr {
+        border: none;
+        border-top: 3px solid grey;
+    }
+
+    #infobox {
+        min-height: 160px;
+        padding-bottom: 18px;
+    }
+
+    .text-med {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .text-lrg {
+        font-size: 2em;
+        font-weight: bold;
+    }
+
+    .grid {
+        display: grid;
+        grid-gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        justify-items: stretch;
+        width: 100%;
+        margin: 0;
+    }
+
+    .next {
+        height: 24px;
+        cursor: pointer;
+    }
 </style>
