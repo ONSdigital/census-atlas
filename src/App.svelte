@@ -267,6 +267,7 @@
 					setColors();
 				}
 				loading = false;
+				tFinish = performance.now();
 				console.log(`performance:${selectMeta.code}:${tFinish-tStart}`)
 				console.log(`cache_size:${Object.keys(data).length}`)
 			});
