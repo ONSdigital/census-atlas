@@ -17,15 +17,15 @@ export async function getTopo(url, layer) {
 
 export async function getNomis(code, tableName, dataCache) {
 	const last_lsoa = 34752
-	const cacheKeys = Object.keys(dataCache)
-	const cacheEmpty = (cacheKeys.length == 0)
-	const tableColNameInCache = cacheKeys.find(tableColumnName => tableColumnName.toLowerCase().startsWith(tableName))
 	let url;
 	let accessorFunc;
-	if (cacheEmpty) {
+	if (dataCache.allGeographyCodes.length === 0) {
+		dataCache.allTotals[tableName] = []
 		url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${tableName}?cols=geography_code,total,${code}`;
 		accessorFunc = (d, i) => {
 			if (i <= last_lsoa) {
+				dataCache.allGeographyCodes.push(d['geography_code'])
+				dataCache.allTotals[tableName].push(+d['total'])
 				return {
 					code: d['geography_code'],
 					value: +d[code],
@@ -34,30 +34,32 @@ export async function getNomis(code, tableName, dataCache) {
 				};
 			};
 		}
-	} else if (tableColNameInCache) {
-		url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${tableName}?cols=${code}`;
-		accessorFunc = (d, i) => {
-			if (i <= last_lsoa) {
-				return {
-					code: dataCache[tableColNameInCache].lsoa.data[i].code,
-					value: +d[code],
-					count: dataCache[tableColNameInCache].lsoa.data[i].count,
-					perc: (+d[code] / dataCache[tableColNameInCache].lsoa.data[i].count) * 100
-				};
-			};
-		}
-	} else {
+	} else if (dataCache.allTotals[tableName] === undefined) {
 		url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${tableName}?cols=total,${code}`;
+		dataCache.allTotals[tableName] = []
 		accessorFunc = (d, i) => {
 			if (i <= last_lsoa) {
+				dataCache.allTotals[tableName].push(+d['total'])
 				return {
-					code: dataCache[cacheKeys[0]].lsoa.data[i].code,
+					code: dataCache.allGeographyCodes[i],
 					value: +d[code],
 					count: +d['total'],
 					perc: (+d[code] / +d['total']) * 100
 				};
 			}
 		};
+	} else {
+		url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${tableName}?cols=${code}`;
+		accessorFunc = (d, i) => {
+			if (i <= last_lsoa) {
+				return {
+					code: dataCache.allGeographyCodes[i],
+					value: +d[code],
+					count: dataCache.allTotals[tableName][i],
+					perc: (+d[code] / dataCache.allTotals[tableName][i]) * 100
+				};
+			};
+		}
 	}
 
   let response = await fetch(url);

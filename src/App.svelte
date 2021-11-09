@@ -58,7 +58,10 @@
 	let ladlookup;
 	let ladlist;
 	let lsoalookup;
-	let data = {};
+	let data = {
+		allGeographyCodes: [],
+		allTotals: {}
+	};
 	let active = {
 		lsoa: {
 			selected: null,
