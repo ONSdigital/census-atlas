@@ -196,18 +196,10 @@
 		}
 	}
 
-	function getTableGeoAndTotals (tableName) {
+	function getTableGeoAndTotalsCacheKey (tableName) {
 		for (let tableColumn in data) {
 			if (tableColumn.toLowerCase().startsWith(tableName)) {
-				let output = {
-					'geography_code': [],
-					'total': []
-				}
-				for (let lsoa_row in data[tableColumn].lsoa.data) {
-					output['geography_code'].push(data[tableColumn].lsoa.data[lsoa_row].code)
-					output['total'].push(data[tableColumn].lsoa.data[lsoa_row].count)
-				}
-				return output
+				return tableColumn
 			}
 		}
 		return false
@@ -229,14 +221,7 @@
 			// let url = `https://bothness.github.io/census-atlas/data/lsoa/${selectMeta.code}.csv`;
 			let table = selectMeta.code.slice(0,-3).toLowerCase()
 			let col_header = `_${parseInt(selectMeta.cell)}`
-			let alreadyHaveGeoTotals = getTableGeoAndTotals(table)
-			let url;
-			if (alreadyHaveGeoTotals == false) {
-				url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${table}?cols=geography_code,total,${col_header}`
-			} else {
-				url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${table}?cols=${col_header}`
-			}
-			getNomis(url, col_header, alreadyHaveGeoTotals).then((res) => {
+			getNomis(col_header, table, data).then((res) => {
 				let dataset = {
 					lsoa: {},
 					lad: {},

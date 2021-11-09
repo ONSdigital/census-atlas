@@ -15,13 +15,16 @@ export async function getTopo(url, layer) {
   return geojson;
 }
 
-export async function getNomis(url, code, alreadyHaveGeoTotals) {
+export async function getNomis(code, tableName, dataCache) {
 	const last_lsoa = 34752
-  let response = await fetch(url);
-  let string = await response.text();
-	let data;
-	if (alreadyHaveGeoTotals == false) {
-		data = await csvParse(string, (d, i) => {
+	const cacheKeys = Object.keys(dataCache)
+	const cacheEmpty = (cacheKeys.length == 0)
+	const tableColNameInCache = cacheKeys.find(tableColumnName => tableColumnName.toLowerCase().startsWith(tableName))
+	let url;
+	let accessorFunc;
+	if (cacheEmpty) {
+		url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${tableName}?cols=geography_code,total,${code}`;
+		accessorFunc = (d, i) => {
 			if (i <= last_lsoa) {
 				return {
 					code: d['geography_code'],
@@ -29,20 +32,37 @@ export async function getNomis(url, code, alreadyHaveGeoTotals) {
 					count: +d['total'],
 					perc: (+d[code] / +d['total']) * 100
 				};
-			}
-		});
-	} else {
-		data = await csvParse(string, (d, i) => {
+			};
+		}
+	} else if (tableColNameInCache) {
+		url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${tableName}?cols=${code}`;
+		accessorFunc = (d, i) => {
 			if (i <= last_lsoa) {
 				return {
-					code: alreadyHaveGeoTotals.geography_code[i],
+					code: dataCache[tableColNameInCache].lsoa.data[i].code,
 					value: +d[code],
-					count: alreadyHaveGeoTotals.total[i],
-					perc: (+d[code] / alreadyHaveGeoTotals.total[i]) * 100
+					count: dataCache[tableColNameInCache].lsoa.data[i].count,
+					perc: (+d[code] / dataCache[tableColNameInCache].lsoa.data[i].count) * 100
+				};
+			};
+		}
+	} else {
+		url = `https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/atlas2011.${tableName}?cols=total,${code}`;
+		accessorFunc = (d, i) => {
+			if (i <= last_lsoa) {
+				return {
+					code: dataCache[cacheKeys[0]].lsoa.data[i].code,
+					value: +d[code],
+					count: +d['total'],
+					perc: (+d[code] / +d['total']) * 100
 				};
 			}
-		});
+		};
 	}
+
+  let response = await fetch(url);
+	let string = await response.text();
+	let data = await csvParse(string, accessorFunc)
 	return data;
 }
 

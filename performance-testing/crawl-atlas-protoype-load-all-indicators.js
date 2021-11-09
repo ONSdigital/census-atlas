@@ -1,7 +1,7 @@
 // click on all unexpanded drop-down span elements for indicates. Loop n times with 1 second timeout between
 // each loop to ensure all are expanded.
 const n_menu_expansion_loops=10;
-const n_radios_to_click=1;
+const n_radios_to_click=100;
 for (i=1; i<=n_menu_expansion_loops+1; i++) {
   if (i<=n_menu_expansion_loops) {
     setTimeout(
