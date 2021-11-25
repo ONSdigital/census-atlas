@@ -2,6 +2,7 @@ import { csvParse } from "d3-dsv";
 import { ckmeans } from "simple-statistics";
 import { lsoaLookup } from "../../geography/geography";
 import config from "../../../config";
+import simpleTopicTableCategoryData from "../../../data/simpleTopicTableCategoryData";
 
 export default class LegacyCensusDataService {
   constructor() {
@@ -30,6 +31,10 @@ export default class LegacyCensusDataService {
     };
   }
 
+  async fetchCensusTableStructure() {
+    return simpleTopicTableCategoryData
+  }
+  
   async fetchLsoaCategoryData(categoryId) {
     let url = `https://bothness.github.io/census-atlas/data/lsoa/${categoryId}.csv`;
     let response = await fetch(url);

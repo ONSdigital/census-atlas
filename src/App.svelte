@@ -17,8 +17,8 @@
   export let url = "";
 
   initialiseGeography(new LegacyGeographyService()).then(() => {
-    initialiseCensusData(new LegacyCensusDataService());
-    setInitialised();
+    initialiseCensusData(new LegacyCensusDataService()).then(() => 
+      setInitialised());
   });
 </script>
 

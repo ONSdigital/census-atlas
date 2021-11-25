@@ -1,4 +1,6 @@
 <script>
+  import { ladLookup } from '../model/geography/geography'
+  
   export let tableName;
   export let location;
 </script>
@@ -21,7 +23,7 @@
       <hr />
       {#if location}
         <div class="ons-grid--flex ons-grid--between">
-          <h2 class="ons-header__title" id="header-data-2__location">In {location}</h2>
+          <h2 class="ons-header__title" id="header-data-2__location">In {ladLookup[location].name}</h2>
           <a href="0#">Change</a>
         </div>
       {:else}

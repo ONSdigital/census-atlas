@@ -10,7 +10,7 @@
   import Feedback from "../ui/Feedback.svelte";
   import DataHeader from "../ui/DataHeader.svelte";
   import { categoryDataIsLoaded, categoryData, fetchCensusData } from "../model/censusdata/censusdata";
-  import { updateHoveredGeography, updateSelectedGeography, loadingGeography } from "../model/geography/geography";
+  import { updateHoveredGeography, updateSelectedGeography, loadingGeography, hoveredGeography, selectedGeography } from "../model/geography/geography";
   import config from "../config";
   import TileSet from "../ui/map/TileSet.svelte";
   import InteractiveLayer from "../ui/map/InteractiveLayer.svelte";
@@ -30,10 +30,9 @@
 
 <BasePage>
   <span slot="header">
-    <DataHeader tableName={categoryId} location={locationId} />
+    <DataHeader tableName={categoryId} location={$selectedGeography.lad} />
     <CategorySelector />
   </span>
-
   <span slot="map">
     <Map maxzoom={14}>
       <TileSet
@@ -50,12 +49,8 @@
         <InteractiveLayer
           id="lad-interactive-layer"
           maxzoom={config.ux.map.lsoa_breakpoint}
-          onSelect={(code) => {
-            updateSelectedGeography(code);
-          }}
-          onHover={(code) => {
-            updateHoveredGeography(code);
-          }}
+          onSelect={(code) => { updateSelectedGeography(code); }}
+          onHover={(code) => { updateHoveredGeography(code); }}
         />
       </TileSet>
 
