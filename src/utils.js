@@ -83,7 +83,9 @@ export async function getNomis(categoryID, map) {
 		dbColumn,
     ].join(",");
 	const url = `${baseURL}?bbox=${bboxQuery}&cols=${colsQuery}`;
+	let tStart = performance.now()
   	let response = await fetch(url);
+	console.log(`got response from ${url} in ${performance.now()-tStart}ms`)
   	let string = await response.text();
 	let data = await csvParse(string, (d) => {
 		return {
@@ -93,7 +95,6 @@ export async function getNomis(categoryID, map) {
 			perc: (+d[dbColumn] / +d[dbtotalsColumn]) * 100
 		};
 	});
-	console.log(`${colsQuery} loaded for bounding box ${bboxQuery}`)
 	return data;
 }
 
