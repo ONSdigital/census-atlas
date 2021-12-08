@@ -6,31 +6,30 @@ import simpleTopicTableCategoryData from "../../../data/simpleTopicTableCategory
 
 import { mapZoomBBox } from "../../../stores.js"
 
-// load all data for K04000001 (England & Wales) on init, store seperately and set on new data load?
+const baseURL = "https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/skinny";
 
 export default class APIDemoDataService {
   constructor() {
     this.reset();
-    this.currentCategoryID = ""; // probably need a real default here
+    this.currentCategoryID = null;
     mapZoomBBox.subscribe(value => {
       this.mapZoomBBox = value;
       this.fetchLsoaCategoryData(this.currentCategoryID);
     })
+    this.EWdataBatchNomisKeyed = {};
+    this.fetchAllEWCategoryData();
   }
 
   reset() {
     this.dataset = {
       lsoa: {
-        data: [],
         index: {},
         breaks: [],
       },
       higher: {
-        data: [],
         index: {},
       },
       lad: {
-        data: [],
         index: {},
       },
       englandAndWales: {
@@ -44,8 +43,25 @@ export default class APIDemoDataService {
     return simpleTopicTableCategoryData
   }
 
+  // make sure something calls this on init
+  async fetchAllEWCategoryData() {
+    const url = `${baseURL}?rows=K04000001`;
+    let response = await fetch(url);
+    let string = await response.text();
+    csvParse(string, (row, i, cols) => {
+      cols.forEach((col) => {
+        this.EWdataBatchNomisKeyed[col] = +row[col];
+      });     
+    });
+  }
   // fetch the ew, lad and lsoa data
   async fetchLsoaCategoryData(categoryId) {
+    // don't do anything if no categoryId selected
+    if (categoryId === null) {
+      console.log('No categoryID selectected, skipping data load.')
+      return this.dataset.lsoa.index
+    }    
+    
     this.currentCategoryID = categoryId;
 
     // bbox query
@@ -55,71 +71,50 @@ export default class APIDemoDataService {
       this.mapZoomBBox.neCorner.lon,
       this.mapZoomBBox.neCorner.lat
     ].join((","));
-    
-    // additional geography_code row query (NB K04000001 = 'England and Wales')
-    const rowQuery = "K04000001";
 
-    // cols query, including the geography type and geography_code, category totals and category data
+    // cols query, including the geography_code, category totals and category data
     const dbColumn = this.categoryIDToDBTotalsColumn(categoryId);
     const dbtotalsColumn = this.categoryIDToDBColumn(categoryId);
     const colsQuery = [
-      "geo_type",
       "geography_code",
       dbtotalsColumn,
       dbColumn,
     ].join(",");
     
-    // ask for LAD & LSOA if zoom level > 9, otherwise LAD only
-    const geoTypeQuery = this.mapZoomBBox.zoom >= 9 ? "EW,LAD,LSOA" : "EW,LAD";
-    
     // assemble URL and query API
-    const baseURL = "https://5laefo1cxd.execute-api.eu-central-1.amazonaws.com/dev/hello/skinny";
-    const url = `${baseURL}?bbox=${bboxQuery}&rows=${rowQuery}&cols=${colsQuery}&geo_type=${geoTypeQuery}`;
+    const url = `${baseURL}?bbox=${bboxQuery}&cols=${colsQuery}`;
     let response = await fetch(url);
     let string = await response.text();
 
     // parse csv string to dataset
     let lsoaPercs = [];
     csvParse(string, (row) => {
-      switch (row["geo_type"]) {
-        case "EW":
-          Object.assign(
-            this.dataset,
-            {
-              englandAndWales: {
-                value: +row[dbColumn],
-                count: +row[dbtotalsColumn],
-                perc: (+row[dbColumn] / +row[dbtotalsColumn]) * 100,
-              }
+      // only LSOA and LAD expected, so if it doesn't start with E01...
+      if (row["geography_code"].startsWith('E01')) {
+        const perc = (+row[dbColumn] / +row[dbtotalsColumn]) * 100;
+        lsoaPercs.append(perc);
+        Object.assign(
+          this.dataset.lsoa.index,
+          {
+            [row["geography_code"]]: {
+              value: +row[dbColumn],
+              count: +row[dbtotalsColumn],
+              perc: perc,
             }
-          );
-          break;
-        case "LAD":
-          Object.assign(
-            this.dataset.lad.index,
-            {
-              [row["geography_code"]]: {
-                value: +row[dbColumn],
-                count: +row[dbtotalsColumn],
-                perc: (+row[dbColumn] / +row[dbtotalsColumn]) * 100,
-              }
+          }
+        );
+      } else {
+        // ... then it must be an LAD
+        Object.assign(
+          this.dataset.lad.index,
+          {
+            [row["geography_code"]]: {
+              value: +row[dbColumn],
+              count: +row[dbtotalsColumn],
+              perc: (+row[dbColumn] / +row[dbtotalsColumn]) * 100,
             }
-          );
-          break;
-        case "LSOA":
-          const perc = (+row[dbColumn] / +row[dbtotalsColumn]) * 100;
-          lsoaPercs.append(perc);
-          Object.assign(
-            this.dataset.lsoa.index,
-            {
-              [row["geography_code"]]: {
-                value: +row[dbColumn],
-                count: +row[dbtotalsColumn],
-                perc: perc,
-              }
-            }
-          );
-          break;
+          }
+        );
       };
     });
 
@@ -128,7 +123,12 @@ export default class APIDemoDataService {
     let chunks = ckmeans(lsoaPercs, config.ux.legend_sections);
     this.dataset.lsoa.breaks = this._getBreaks(chunks);
     
-    // add 'higher' geography
+    // retrieve EW data from cache
+    this.dataset.englandAndWales.count = this.EWdataBatchNomisKeyed[dbtotalsColumn];
+    this.dataset.englandAndWales.value = this.EWdataBatchNomisKeyed[dbColumn];
+    this.dataset.englandAndWales.perc = (this.dataset.englandAndWales.value / this.dataset.englandAndWales.count) * 100;
+
+    // add to 'higher' geography
     this.dataset.higher = this.dataset.lad;
     this.dataset.higher.index["ENGLAND_AND_WALES"] = this.dataset.englandAndWales;
 
