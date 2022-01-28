@@ -15,39 +15,41 @@
 
 <div class="ons-page {hasMap}">
   <div class="ons-page__content">
-    <a class="ons-skip-link" href="#main-content">Skip to main content</a>
-    <ONSPhaseBanner phase="ALPHA" />
-    <header class="ons-header ons-header--hero" role="banner">
-      <div class="ons-header__top">
-        <div class="ons-container">
-          <div
-            class="ons-header__grid-top ons-grid ons-grid--gutterless ons-grid--flex ons-grid--between ons-grid--vertical-center ons-grid--no-wrap "
-          >
-            <div class="ons-grid__col ons-col-auto">
-              <div class="ons-header__logo--large">
-                <a class="ons-header__logo-link" href="/">
-                  <ONSHeaderLogoLarge />
-                </a>
-              </div>
-              <div class="ons-header__logo--small">
-                <a class="ons-header__logo-link" href="/">
-                  <ONSHeaderLogoSmall />
-                </a>
-              </div>
-            </div>
-            <div class="ons-header__links grid__col col-auto">
+    <div class="fixed-header">
+      <a class="ons-skip-link" href="#main-content">Skip to main content</a>
+      <ONSPhaseBanner phase="ALPHA" />
+      <header class="ons-header ons-header--hero" role="banner">
+        <div class="ons-header__top">
+          <div class="ons-container">
+            <div
+              class="ons-header__grid-top ons-grid ons-grid--gutterless ons-grid--flex ons-grid--between ons-grid--vertical-center ons-grid--no-wrap "
+            >
               <div class="ons-grid__col ons-col-auto">
-                <ul class="ons-language-links">
-                  <li class="ons-language-links__item">
-                    <a href="#0" lang="cy">Cymraeg</a>
-                  </li>
-                </ul>
+                <div class="ons-header__logo--large">
+                  <a class="ons-header__logo-link" href="/">
+                    <ONSHeaderLogoLarge />
+                  </a>
+                </div>
+                <div class="ons-header__logo--small">
+                  <a class="ons-header__logo-link" href="/">
+                    <ONSHeaderLogoSmall />
+                  </a>
+                </div>
+              </div>
+              <div class="ons-header__links grid__col col-auto">
+                <div class="ons-grid__col ons-col-auto">
+                  <ul class="ons-language-links">
+                    <li class="ons-language-links__item">
+                      <a href="#0" lang="cy">Cymraeg</a>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </div>
     <div class="wrapper">
       <!-- // XXX This .header should really be part of <header/> semantically speaking; might need to move it back in there, and reset max-width on the -->
       <div class="header">
@@ -136,6 +138,18 @@
   }
 
   @media (min-width: map-get($grid-bp, s)) {
+    .fixed-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: 94px;
+      width: 100%;
+      z-index: 1;
+    }
+    .wrapper {
+      top: 94px;
+    }
     .header,
     .body {
       width: 489px;
@@ -145,7 +159,7 @@
       padding-bottom: 18px;
     }
     .map {
-      position: absolute;
+      position: fixed;
       left: 489px;
       width: calc(100% - 489px);
       height: 100%;
