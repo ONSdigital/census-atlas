@@ -72,6 +72,8 @@
         ...options,
       });
 
+      map.scrollZoom.disable();
+
       map.addControl(new NavigationControl());
 
       map.addControl(new AttributionControl(), "bottom-left");
