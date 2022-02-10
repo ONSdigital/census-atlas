@@ -25,7 +25,7 @@
   let userInputValue;
   let renderError = false;
 
-  let locationId = $page.query.get("location");
+  let locationId = $page.url.searchParams.get("location");
 
   onMount(async () => {
     $pageUrl = "";

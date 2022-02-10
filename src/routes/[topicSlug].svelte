@@ -36,16 +36,16 @@
   let locationName, locationId, header;
 
   $: {
-    locationId = $page.query.get("location");
+    locationId = $page.url.pathname.get("location");
     updateSelectedGeography(locationId);
     locationName = getLadName(locationId) ? getLadName(locationId) : "England and Wales";
   }
 
   $: {
     if ($selectedGeography.lad) {
-      $page.query.set("location", $selectedGeography.lad);
-      goto(`?${$page.query.toString()}`);
-      locationId = $page.query.get("location");
+      $page.url.pathname.set("location", $selectedGeography.lad);
+      goto(`?${$page.url.pathname.toString()}`);
+      locationId = $page.url.pathname.get("location");
       locationName = getLadName(locationId);
     }
   }

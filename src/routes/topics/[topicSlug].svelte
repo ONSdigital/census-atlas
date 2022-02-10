@@ -13,17 +13,17 @@
   import { returnCorrectArticle } from "../../utils";
 
   import ChangeLocation from "../../ui/ChangeLocation/ChangeLocation.svelte";
-  let locationId = $page.query.get("location");
+  let locationId = $page.url.searchParams.get("location");
   let locationName, header;
   let showChangeLocation = false;
   let { topicSlug } = $page.params;
 
   $: {
-    locationId = $page.query.get("location");
+    locationId = $page.url.searchParams.get("location");
     if ($selectedGeography.lad) {
-      $page.query.set("location", $selectedGeography.lad);
-      goto(`?${$page.query.toString()}`);
-      locationId = $page.query.get("location");
+      $page.url.pathname.set("location", $selectedGeography.lad);
+      goto(`?${$page.url.pathname.toString()}`);
+      locationId = $page.url.searchParams.get("location");
       locationName = getLadName(locationId);
     }
   }

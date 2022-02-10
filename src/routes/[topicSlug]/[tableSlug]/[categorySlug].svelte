@@ -63,7 +63,7 @@
   });
   let cardParas;
 
-  let locationId = $page.query.get("location");
+  let locationId = $page.url.searchParams.get("location");
 
   onMount(async () => {
     $pageUrl = $page.url.pathname + (locationId ? `?location=${locationId}` : "");
@@ -74,8 +74,8 @@
   });
 
   $: {
-    locationId = $page.query.get("location");
-    geoCode = $page.query.get("location") ? $page.query.get("location") : config.eAndWGeoCode;
+    locationId = $page.url.searchParams.get("location");
+    geoCode = $page.url.searchParams.get("location") ? $page.url.searchParams.get("location") : config.eAndWGeoCode;
     categorySlug = $page.params.categorySlug;
     updateSelectedGeography(locationId);
     locationName = getLadName(locationId);
@@ -84,9 +84,9 @@
 
   $: {
     if ($selectedGeography.lad) {
-      $page.query.set("location", $selectedGeography.lad);
-      goto(`?${$page.query.toString()}`);
-      locationId = $page.query.get("location");
+      $page.url.searchParams.set("location", $selectedGeography.lad);
+      goto(`?${$page.url.searchParams.toString()}`);
+      locationId = $page.url.searchParams.get("location");
       geoCode = locationId;
       locationName = getLadName(locationId);
     }

@@ -63,7 +63,7 @@
   };
 
   afterUpdate(async () => {
-    geoCode = $page.query.get("location");
+    geoCode = $page.url.searchParams.get("location");
     const peopleCategory = getCategoryBySlug("ethnicity", "asian-asian-british-indian");
     const housingCategory = getCategoryBySlug("size-of-household", "1-person-household");
     peopleTable = peopleCategory ? tables[peopleCategory.table] : null;
@@ -95,16 +95,16 @@
   $: appIsInitialised, $appIsInitialised && initialisePage();
 
   $: {
-    locationId = $page.query.get("location");
+    locationId = $page.url.searchParams.get("location");
     updateSelectedGeography(locationId);
     locationName = getLadName(locationId) ? getLadName(locationId) : "England and Wales";
     topicSuggestions = areaSelectedTopicSuggestions(locationName, locationId);
   }
   $: {
     if ($selectedGeography.lad) {
-      $page.query.set("location", $selectedGeography.lad);
-      goto(`?${$page.query.toString()}`);
-      locationId = $page.query.get("location");
+      $page.url.searchParams.set("location", $selectedGeography.lad);
+      goto(`?${$page.url.searchParams.toString()}`);
+      locationId = $page.url.searchParams.get("location");
       locationName = getLadName(locationId);
     }
   }

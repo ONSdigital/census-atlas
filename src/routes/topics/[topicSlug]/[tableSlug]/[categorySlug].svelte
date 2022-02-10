@@ -15,16 +15,16 @@
   import { goto } from "$app/navigation";
   import { returnCorrectArticle } from "../../../../utils";
   let { topicSlug, tableSlug, categorySlug } = $page.params;
-  let locationId = $page.query.get("location");
+  let locationId = $page.url.searchParams.get("location");
   let locationName, header;
   let showChangeLocation = false;
   $: category = getCategoryBySlug(tableSlug, categorySlug);
   $: {
-    locationId = $page.query.get("location");
+    locationId = $page.url.searchParams.get("location");
     if ($selectedGeography.lad) {
-      $page.query.set("location", $selectedGeography.lad);
-      goto(`?${$page.query.toString()}`);
-      locationId = $page.query.get("location");
+      $page.url.searchParams.set("location", $selectedGeography.lad);
+      goto(`?${$page.url.searchParams.toString()}`);
+      locationId = $page.url.searchParams.get("location");
       locationName = getLadName(locationId);
     }
   }
