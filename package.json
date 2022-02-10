@@ -47,7 +47,6 @@
     "normalize.css": "^8.0.1",
     "simple-statistics": "^7.7.3",
     "slugify": "^1.6.5",
-    "svelte-routing": "^1.6.0",
     "turf": "^3.0.14"
   },
   "type": "module",
