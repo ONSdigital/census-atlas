@@ -66,7 +66,7 @@
   let locationId = $page.query.get("location");
 
   onMount(async () => {
-    $pageUrl = $page.path + (locationId ? `?location=${locationId}` : "");
+    $pageUrl = $page.url.pathname + (locationId ? `?location=${locationId}` : "");
     if (locationId) {
       updateSelectedGeography(locationId);
       locationName = getLadName(locationId);
@@ -79,7 +79,7 @@
     categorySlug = $page.params.categorySlug;
     updateSelectedGeography(locationId);
     locationName = getLadName(locationId);
-    $pageUrl = $page.path + (locationId ? `?location=${locationId}` : "");
+    $pageUrl = $page.url.pathname + (locationId ? `?location=${locationId}` : "");
   }
 
   $: {
@@ -97,7 +97,8 @@
     $appIsInitialised && locationId && (neighbouringLad = returnNeighbouringLad(locationId)),
     fetchSelectedDataset();
   $: categorySlug,
-    $appIsInitialised && (updateMap(category), ($pageUrl = $page.path + (locationId ? `?location=${locationId}` : "")));
+    $appIsInitialised &&
+      (updateMap(category), ($pageUrl = $page.url.pathname + (locationId ? `?location=${locationId}` : "")));
 
   // temporary line to load some data
   $: appIsInitialised, $appIsInitialised && $censusTableStructureIsLoaded && (initialisePage(), fetchSelectedDataset());
