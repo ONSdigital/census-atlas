@@ -3,7 +3,7 @@ import { ckmeans } from "simple-statistics";
 import { lsoaLookup } from "./../../geography/geography";
 import config from "./../../../config";
 import simpleTopicTableCategoryData from "../../../data/apiMetadata";
-
+import MetadataApiDataService from "../../metadata/services/metadataApiDataService";
 export default class LegacyCensusDataService {
   constructor() {
     this.reset();
@@ -32,7 +32,14 @@ export default class LegacyCensusDataService {
   }
 
   async fetchCensusTableStructure() {
-    return simpleTopicTableCategoryData;
+    if (config.useMetadataAPI) {
+      const apiMetadataService = new MetadataApiDataService();
+      var resp = await apiMetadataService.fetchCensusMetadata();
+      console.log(resp);
+      return resp;
+    } else {
+      return simpleTopicTableCategoryData;
+    }
   }
 
   async fetchLsoaCategoryData(categoryId) {

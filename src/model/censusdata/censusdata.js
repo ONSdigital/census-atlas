@@ -119,25 +119,27 @@ export async function fetchTableStructure(censusDataService) {
     };
 
     topic.tables.forEach((table) => {
-      tables[table.code] = {
-        topic: topic.code,
-        code: table.code,
-        name: table.name,
-        slug: table.slug,
-        categories: table.categories.map((category) => category.code),
-        categoriesArray: table.categories,
-      };
-      categoryCodeLookup[table.slug] = {};
-      table.categories.forEach((category) => {
-        categories[category.code] = {
-          code: category.code,
-          name: category.name,
-          slug: category.slug,
-          table: table.code,
+      if (table.categories) {
+        tables[table.code] = {
           topic: topic.code,
+          code: table.code,
+          name: table.name,
+          slug: table.slug,
+          categories: table.categories.map((category) => category.code),
+          categoriesArray: table.categories,
         };
-        categoryCodeLookup[table.slug][category.slug] = category.code;
-      });
+        categoryCodeLookup[table.slug] = {};
+        table.categories.forEach((category) => {
+          categories[category.code] = {
+            code: category.code,
+            name: category.name,
+            slug: category.slug,
+            table: table.code,
+            topic: topic.code,
+          };
+          categoryCodeLookup[table.slug][category.slug] = category.code;
+        });
+      }
     });
   });
 

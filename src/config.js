@@ -105,6 +105,7 @@ export default {
       },
     ],
   },
+  useMetadataAPI: false,
 };
 
 export const topicSuggestions = [
