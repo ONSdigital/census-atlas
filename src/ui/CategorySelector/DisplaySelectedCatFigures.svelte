@@ -38,7 +38,9 @@
     </p>
     <p class="category-figures__totals" style="color: {textColour}">
       {selectedCatData.val} of {selectedCatData.total}
-      {selectedCatData.unit.toLowerCase()}
+      {#if selectedCatData.unit}
+        {selectedCatData.unit.toLowerCase()}
+      {/if}
     </p>
   </div>
 {/if}

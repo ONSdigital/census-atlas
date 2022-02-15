@@ -12,4 +12,8 @@ export default class MetadataApiDataService {
     const response = await fetch(url);
     return response.json();
   }
+
+  async fetchCensusTableStructure() {
+    return await this.fetchCensusMetadata();
+  }
 }

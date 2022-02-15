@@ -6,12 +6,13 @@
   import { setInitialised, appIsInitialised } from "./../model/appstate";
   import { fetchAllDataForGeography } from "./../model/censusdata/censusdata";
   import GeodataApiDataService from "./../model/censusdata/services/geodataApiDataService";
-  import { initialiseCensusMetadataFromFlatFile } from "./../model/metadata/metadata";
+  import { initialiseCensusMetadata } from "./../model/metadata/metadata";
+  import MetadataApiDataService from "./../model/metadata/services/metadataApiDataService";
   import config from "./../config";
 
   initialiseGeography(new LegacyGeographyService()).then(() => {
-    initialiseCensusData(new FlatfileMetadataService())
-      .then(() => initialiseCensusMetadataFromFlatFile(new FlatfileMetadataService()))
+    initialiseCensusData(new MetadataApiDataService())
+      .then(() => initialiseCensusMetadata(new MetadataApiDataService()))
       .then(() => setInitialised());
   });
 

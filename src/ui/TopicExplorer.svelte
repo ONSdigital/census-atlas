@@ -52,7 +52,9 @@
               >{tableEntry.name}</a
             >
           </h3>
-          <p class="ons-collapsible__table-description">{tableEntry.desc}</p>
+          {#if tableEntry.desc}
+            <p class="ons-collapsible__table-description">{tableEntry.desc}</p>
+          {/if}
           <NestableCollapsible id="{tableEntry.slug}-{i}" title={tableEntry.name}>
             <ul class="ons-list ons-list--bare">
               {#each tableEntry.categories as category}
