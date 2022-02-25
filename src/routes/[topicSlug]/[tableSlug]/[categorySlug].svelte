@@ -77,7 +77,7 @@
   $: category = getCategoryBySlug(tableSlug, categorySlug);
 
   $: geoCode,
-    $appIsInitialised && locationId && (neighbouringLad = returnNeighbouringLad(locationId)),
+    $appIsInitialised && locationId && $selectedGeography.lad && (neighbouringLad = returnNeighbouringLad(locationId)),
     fetchSelectedDataset();
   $: categorySlug,
     $appIsInitialised && (updateMap(category), ($pageUrl = $page.path + (locationId ? `?location=${locationId}` : "")));
@@ -97,7 +97,7 @@
   }
 
   const initialisePage = () => {
-    if (locationId != null) {
+    if (locationId != null && $selectedGeography.lad) {
       neighbouringLad = returnNeighbouringLad(locationId);
     }
     category = getCategoryBySlug(tableSlug, categorySlug);
