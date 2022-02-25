@@ -1,5 +1,5 @@
 import MockGeographyService from "./services/mockGeographyService";
-import { getLadAndLsoa, initialiseGeography, loadingGeography, reset } from "./geography";
+import { findSelectedGeography, initialiseGeography, loadingGeography, reset } from "./geography";
 
 describe("initialise geography", () => {
   it("calls functions from the geography service", async () => {
@@ -47,7 +47,7 @@ describe("initialise geography", () => {
   it("creates a lookup for lsoa info keyed by code", async () => {});
 });
 
-describe("getLadAndLsoa", () => {
+describe("findSelectedGeography", () => {
   const ladData = [
     { code: "barnet", name: "Barnet" },
     { code: "voh", name: "Vale of Horse" },
@@ -69,7 +69,7 @@ describe("getLadAndLsoa", () => {
 
     // when
     //
-    let result = getLadAndLsoa(lsoaCode);
+    let result = findSelectedGeography(lsoaCode);
 
     // then
     //
@@ -86,7 +86,7 @@ describe("getLadAndLsoa", () => {
 
     // when
     //
-    let result = getLadAndLsoa(ladCode);
+    let result = findSelectedGeography(ladCode);
 
     // then
     //
@@ -103,7 +103,7 @@ describe("getLadAndLsoa", () => {
 
     // when
     //
-    let result = getLadAndLsoa(code);
+    let result = findSelectedGeography(code);
 
     // then
     //

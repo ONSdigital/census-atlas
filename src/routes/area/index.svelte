@@ -41,8 +41,8 @@
     topicSuggestions = areaSelectedTopicSuggestions(locationName, locationId);
   }
   $: {
-    if ($selectedGeography.lad) {
-      $page.query.set("location", $selectedGeography.lad);
+    if ($selectedGeography.lad || $selectedGeography.msoa) {
+      $page.query.set("location", $selectedGeography.lad ?? $selectedGeography.msoa);
       goto(`?${$page.query.toString()}`);
       locationId = $page.query.get("location");
       locationName = getLadName(locationId);

@@ -76,7 +76,8 @@
       <DataLayer id="msoa-data" catCode={category.code} />
     {/if}
     <InteractiveLayer
-      id="msoa-boundaries"
+      id="msoa-interactive-layer"
+      selected={$selectedGeography.msoa}
       onSelect={(code) => {
         updateSelectedGeography(code);
       }}

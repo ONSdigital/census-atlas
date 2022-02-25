@@ -14,21 +14,23 @@ export var lsoaLookup = {};
 export let loadingGeography = writable(false);
 export let selectedGeography = writable({
   lad: null,
+  msoa: null,
   lsoa: null,
 });
 export let hoveredGeography = writable({
   lad: null,
+  msoa: null,
   lsoa: null,
 });
 export let zoom = writable(config.ux.default_zoom);
 
 // ACTIONS
 export function updateSelectedGeography(geographyCode) {
-  selectedGeography.set(getLadAndLsoa(geographyCode));
+  selectedGeography.set(findSelectedGeography(geographyCode));
 }
 
 export function updateHoveredGeography(geographyCode) {
-  hoveredGeography.set(getLadAndLsoa(geographyCode));
+  hoveredGeography.set(findSelectedGeography(geographyCode));
 }
 
 export function updateZoom(newZoom) {
@@ -37,15 +39,23 @@ export function updateZoom(newZoom) {
 
 // ------
 
-export function getLadAndLsoa(geographyCode) {
+export function findSelectedGeography(geographyCode) {
   if (lsoaLookup[geographyCode]) {
     return {
       lad: lsoaLookup[geographyCode].parent,
+      msoa: null,
       lsoa: geographyCode,
+    };
+  } else if (ladLookup[geographyCode]) {
+    return {
+      lad: geographyCode,
+      msoa: null,
+      lsoa: null,
     };
   } else {
     return {
-      lad: geographyCode,
+      lad: null,
+      msoa: geographyCode,
       lsoa: null,
     };
   }
@@ -68,10 +78,12 @@ export function reset() {
   loadingGeography.set(false);
   selectedGeography.set({
     lad: null,
+    msoa: null,
     lsoa: null,
   });
   hoveredGeography.set({
     lad: null,
+    msoa: null,
     lsoa: null,
   });
   zoom.set(config.ux.default_zoom);
