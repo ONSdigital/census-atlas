@@ -28,7 +28,7 @@
     mapBBoxCodes.set(getMapBBoxGeoCodes(map));
   }
   $: {
-    if (map) {
+    if (map && !$selectedGeography.msoa) {
       if ($selectedGeography.lad && ladBoundsLookup[$selectedGeography.lad]) {
         bounds = [
           ladBoundsLookup[$selectedGeography.lad].maxX,

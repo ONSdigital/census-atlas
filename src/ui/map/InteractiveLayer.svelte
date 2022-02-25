@@ -12,7 +12,6 @@
   export let selected = null;
   export let hovered = null;
   export let click = true;
-  export let clickCenter = false;
   export let hover = true;
   export let maxzoom = getContext("tileset-maxzoom");
   export let minzoom = getContext("tileset-minzoom");
@@ -111,7 +110,7 @@
 
         map.setFeatureState({ source: source, sourceLayer: sourceLayer, id: selected }, { selected: true });
 
-        if (clickCenter) {
+        if (id == "msoa-interactive-layer") {
           map.flyTo({
             center: centroid(e.features[0].toJSON().geometry.coordinates),
           });
