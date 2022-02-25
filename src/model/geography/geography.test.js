@@ -76,10 +76,11 @@ describe("findSelectedGeography", () => {
     expect(result).toStrictEqual({
       lad: "barnet",
       lsoa: "barnet1",
+      msoa: null,
     });
   });
 
-  it("returns null for lsoa if geography code is for lad", async () => {
+  it("returns null for lsoa and msoa if geography code is for lad", async () => {
     // given
     // a code for an lad
     let ladCode = "barnet";
@@ -93,10 +94,29 @@ describe("findSelectedGeography", () => {
     expect(result).toStrictEqual({
       lad: "barnet",
       lsoa: null,
+      msoa: null,
     });
   });
 
-  it("returns null for lad and lsoa if geography code is null", async () => {
+  it("returns null for lsoa and lad if geography code is for msoa", async () => {
+    // given
+    // a code for an lad
+    let msoaCode = "msoa";
+
+    // when
+    //
+    let result = findSelectedGeography(msoaCode);
+
+    // then
+    //
+    expect(result).toStrictEqual({
+      lad: null,
+      lsoa: null,
+      msoa: "msoa",
+    });
+  });
+
+  it("returns null for lad, lsoa and msoa if geography code is null", async () => {
     // given
     // a code for an lad
     let code = null;
@@ -110,6 +130,7 @@ describe("findSelectedGeography", () => {
     expect(result).toStrictEqual({
       lad: null,
       lsoa: null,
+      msoa: null,
     });
   });
 });
