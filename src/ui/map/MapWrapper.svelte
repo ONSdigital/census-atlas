@@ -25,7 +25,7 @@
     <InteractiveLayer
       id="lad-interactive-layer"
       selected={$selectedGeography.lad}
-      maxzoom={config.ux.map.buildings_breakpoint}
+      maxzoom={config.ux.map.msoa_boundary_breakpoint}
       onSelect={(code) => {
         updateSelectedGeography(code);
         if (redirectOnSelect) {
@@ -75,6 +75,25 @@
     {#if category && showDataLayer}
       <DataLayer id="msoa-data" catCode={category.code} />
     {/if}
+    <InteractiveLayer
+      id="msoa-boundaries"
+      onSelect={(code) => {
+        updateSelectedGeography(code);
+      }}
+      onHover={(code) => {
+        updateHoveredGeography(code);
+      }}
+      minzoom={config.ux.map.msoa_boundary_breakpoint}
+    />
+  </TileSet>
+
+  <TileSet
+    id="msoa-boundaries"
+    type="vector"
+    url={config.legacy.msoabounds.url}
+    layer={config.legacy.msoabounds.layer}
+    promoteId={config.legacy.msoabounds.code}
+  >
     <BoundaryLayer
       paint={config.ux.map.paint.msoa_boundary}
       minzoom={config.ux.map.msoa_boundary_breakpoint}

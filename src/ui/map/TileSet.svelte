@@ -92,6 +92,7 @@
       map.addSource(id, {
         type: type,
         tiles: [url],
+        sourceLayer: id,
         ...props,
       });
       isSourceLoaded();
