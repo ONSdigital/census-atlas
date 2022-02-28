@@ -100,7 +100,7 @@ describe("findSelectedGeography", () => {
 
   it("returns null for lsoa and lad if geography code is for msoa", async () => {
     // given
-    // a code for an lad
+    // a code for an msoa
     let msoaCode = "msoa";
 
     // when
