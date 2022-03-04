@@ -24,6 +24,9 @@
     tabindex="0"
     data-ga-action={dataAction}
     on:click={() => (expanded = !expanded)}
+    on:keyup={(event) => {
+      if (event.key === "Enter") expanded = !expanded;
+    }}
   >
     <div class="ons-collapsible__controls">
       <p class="ons-collapsible__title">{title ? `Show ${title} options` : ""}</p>
