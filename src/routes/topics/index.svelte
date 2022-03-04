@@ -1,9 +1,36 @@
 <script>
+  import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
+
   import BasePage from "../../ui/BasePage.svelte";
   import MapWrapper from "../../ui/map/MapWrapper.svelte";
   import config from "../../config";
-  import Header from "../../ui/Header.svelte";
   import TopicList from "../../ui/TopicList.svelte";
+  import { appIsInitialised } from "../../model/appstate";
+  import { getLadName, selectedGeography, updateSelectedGeography } from "../../model/geography/geography";
+  import HeaderWrapper from "../../ui/HeaderWrapper.svelte";
+
+  let locationId = $page.query.get("location");
+  let locationName;
+
+  $: {
+    if ($selectedGeography.lad) {
+      $page.query.set("location", $selectedGeography.lad);
+      goto(`?${$page.query.toString()}`);
+      locationId = $page.query.get("location");
+      locationName = getLadName(locationId);
+    }
+  }
+
+  $: appIsInitialised, $appIsInitialised && initialisePage();
+
+  function initialisePage() {
+    if (locationId) {
+      console.log("hello");
+      locationName = getLadName(locationId);
+      updateSelectedGeography(locationId);
+    }
+  }
 </script>
 
 <svelte:head>
@@ -13,16 +40,13 @@
 
 <BasePage mobileMap={false}>
   <span slot="header">
-    <Header
-      serviceTitle="Explore Census"
-      description="Use our interactive map to find out what people's lives are like across England and Wales."
-    />
+    <HeaderWrapper {locationName} {locationId} />
   </span>
 
   <TopicList />
 
   <span slot="map">
-    <MapWrapper showDataLayer={false} bounds={config.ux.map.englandAndWalesBounds} {redirectOnSelect} />
+    <MapWrapper showDataLayer={false} bounds={config.ux.map.englandAndWalesBounds} />
   </span>
 </BasePage>
 
