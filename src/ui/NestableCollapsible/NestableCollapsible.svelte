@@ -14,7 +14,6 @@
   class="ons-collapsible ons-collapsible--initialised {expandedCollapsible}"
   data-btn-close="Hide this"
   role="group"
-  aria-expanded={expanded}
 >
   <div
     {id}
@@ -27,6 +26,7 @@
     on:keyup={(event) => {
       if (event.key === "Enter") expanded = !expanded;
     }}
+    aria-expanded={expanded}
   >
     <div class="ons-collapsible__controls">
       <p class="ons-collapsible__title">{title ? `Show ${title} options` : ""}</p>
