@@ -54,6 +54,17 @@
                     >{category.name}</a
                   >
                 </li>
+                {#if category.subcategories}
+                  <ul class="ons-list ons-list--dashed">
+                    {#each category.subcategories as subcategory}
+                      <li class="ons-list__item">
+                        <a href="/{topic.slug}/{table.slug}/{category.slug}{locationQueryParam}" class="ons-list__link"
+                          >{subcategory.name}</a
+                        >
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
               {/each}
             </ul>
           </ONSAccordionPanel>

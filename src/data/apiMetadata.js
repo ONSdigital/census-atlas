@@ -15,6 +15,18 @@ export default [
             code: "QS501EW0002",
             name: "No qualifications",
             slug: "no-qualifications",
+            subcategories: [
+              {
+                code: "subCatCode1",
+                name: "subCatName1",
+                slug: "subCatSlug1",
+              },
+              {
+                code: "subCatCode2",
+                name: "subCatName2",
+                slug: "subCatSlug2",
+              },
+            ],
           },
           {
             code: "QS501EW0003",
@@ -45,6 +57,18 @@ export default [
             code: "QS501EW0008",
             name: "Other qualifications",
             slug: "other-qualifications",
+            subcategories: [
+              {
+                code: "subCatCode3",
+                name: "subCatName3",
+                slug: "subCatSlug3",
+              },
+              {
+                code: "subCatCode4",
+                name: "subCatName4",
+                slug: "subCatSlug4",
+              },
+            ],
           },
         ],
         units: "People",
