@@ -1,22 +1,24 @@
 <script>
-  import BasePage from "../../ui/BasePage.svelte";
+  import BasePage from "../../../../ui/BasePage.svelte";
 
-  import Header from "../../ui/Header.svelte";
-  import MapWrapper from "../../ui/map/MapWrapper.svelte";
-  import TopicExplorer from "../../ui/TopicExplorer.svelte";
-  import Feedback from "../../ui/Feedback.svelte";
-  import { appIsInitialised } from "../../model/appstate";
-  import { getLadName, updateSelectedGeography, selectedGeography } from "../../model/geography/geography";
-  import { censusTableStructureIsLoaded } from "../../model/censusdata/censusdata";
-  import { pageUrl } from "../../stores";
+  import Header from "../../../../ui/Header.svelte";
+  import MapWrapper from "../../../../ui/map/MapWrapper.svelte";
+  import TopicExplorer from "../../../../ui/TopicExplorer.svelte";
+  import Feedback from "../../../../ui/Feedback.svelte";
+  import { appIsInitialised } from "../../../../model/appstate";
+  import { getLadName, updateSelectedGeography, selectedGeography } from "../../../../model/geography/geography";
+  import { censusTableStructureIsLoaded, getCategoryBySlug } from "../../../../model/censusdata/censusdata";
+  import { pageUrl } from "../../../../stores";
 
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
 
+  let { topicSlug, tableSlug, categorySlug } = $page.params;
+
   let locationId = $page.query.get("location");
   let locationName;
 
-  let { topicSlug } = $page.params;
+  $: category = getCategoryBySlug(tableSlug, categorySlug);
 
   $: {
     if ($selectedGeography.lad) {
@@ -58,7 +60,7 @@
   </span>
 
   <span slot="map">
-    <MapWrapper showDataLayer={false} />
+    <MapWrapper {category} showDataLayer={true} />
   </span>
   <p>
     Change to a
@@ -66,7 +68,7 @@
   </p>
   <hr />
   {#if $appIsInitialised && $censusTableStructureIsLoaded}
-    <TopicExplorer {locationId} selectedTopic={topicSlug} />
+    <TopicExplorer {locationId} selectedTopic={topicSlug} visitedTable={tableSlug} />
   {/if}
 
   <span slot="footer">

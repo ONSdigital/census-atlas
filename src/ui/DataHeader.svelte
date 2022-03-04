@@ -1,7 +1,9 @@
 <script>
   import slugify from "slugify";
 
-  export let tableName, location, topicPage, topicSlug, tableSlug, categorySlug, locationId;
+  export let tableName, location, topicPage, topicSlug, tableSlug, categorySlug, subcategorySlug, locationId;
+
+  $: subcatSlug = subcategorySlug ? `/${subcategorySlug}` : "";
 
   let locationQueryParam, href;
   $: {
@@ -29,7 +31,7 @@
                 : ""}
             </h2>
           </div>
-          <a href="/categories/{topicSlug}/{tableSlug}/{categorySlug}{locationQueryParam}">Change</a>
+          <a href="/topics/{topicSlug}/{tableSlug}/{categorySlug}{subcatSlug}{locationQueryParam}">Change</a>
         {:else}
           <div class="ons-header__title" id="header-data-2__title">
             <a class="census-atlas-header-2__link" href="/categories{locationQueryParam}">Choose a category</a>

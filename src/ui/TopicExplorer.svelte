@@ -5,8 +5,8 @@
 
   import { onMount } from "svelte";
 
-  export let selectedTopic, visitedTable, locationId, topicToDisplay;
-  let topicIndex, tableIndex, tableSlug;
+  export let selectedTopic, visitedTable, locationId;
+  let tableIndex;
 
   $: locationQueryParam = locationId ? `?location=${locationId}` : "";
 
@@ -17,12 +17,8 @@
           topic.tables.forEach((table) => {
             if (table.slug == visitedTable.toLowerCase()) {
               tableIndex = topic.tables.indexOf(table);
-              tableSlug = table.slug;
             }
           });
-        }
-        if (topic.slug == selectedTopic.toLowerCase()) {
-          topicIndex = $censusMetadata.indexOf(topic);
         }
       });
     }
@@ -30,21 +26,18 @@
 
   // !!! Temporary solution -  to be removed when we'll be able to import the DS js bundle at a component level
   onMount(() => {
-    if (selectedTopic) {
+    if (visitedTable) {
       setTimeout(() => {
-        document.querySelector(`#topic-${topicIndex} .ons-btn`).click();
-        if (visitedTable) {
-          document.querySelector(`#${tableSlug}-${tableIndex}`).click();
-        }
+        document.querySelector(`#table-${tableIndex} .ons-btn`).click();
       }, 250);
     }
   });
 </script>
 
-{#if topicToDisplay || selectedTopic}
+{#if selectedTopic}
   <ONSAccordion showAll={false}>
     {#each $censusMetadata as topic}
-      {#if topic.slug == (topicToDisplay.toLowerCase() || selectedTopic.toLowerCase())}
+      {#if topic.slug == selectedTopic.toLowerCase()}
         {#each topic.tables as table, i}
           <ONSAccordionPanel id="table-{i}" title={table.name} noTopBorder description={table.desc}>
             <ul class="ons-list ons-list--bare">
@@ -58,8 +51,9 @@
                   <ul class="ons-list ons-list--dashed">
                     {#each category.subcategories as subcategory}
                       <li class="ons-list__item">
-                        <a href="/{topic.slug}/{table.slug}/{category.slug}{locationQueryParam}" class="ons-list__link"
-                          >{subcategory.name}</a
+                        <a
+                          href="/{topic.slug}/{table.slug}/{category.slug}/{subcategory.slug}{locationQueryParam}"
+                          class="ons-list__link">{subcategory.name}</a
                         >
                       </li>
                     {/each}
