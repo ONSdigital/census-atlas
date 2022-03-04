@@ -1,12 +1,11 @@
 <script>
   import ONSAccordion from "./../ui/ons/ONSAccordion.svelte";
   import ONSAccordionPanel from "./../ui/ons/partials/ONSAccordionPanel.svelte";
-  import NestableCollapsible from "./NestableCollapsible/NestableCollapsible.svelte";
   import { censusMetadata } from "../model/metadata/metadata";
 
   import { onMount } from "svelte";
 
-  export let selectedTopic, visitedTable, locationId;
+  export let selectedTopic, visitedTable, locationId, topicToDisplay;
   let topicIndex, tableIndex, tableSlug;
 
   $: locationQueryParam = locationId ? `?location=${locationId}` : "";
@@ -42,33 +41,27 @@
   });
 </script>
 
-<ONSAccordion showAll={false}>
-  {#each $censusMetadata as topic, i}
-    <ONSAccordionPanel id="topic-{i}" title={topic.name} noTopBorder description={topic.desc}>
-      {#each topic.tables as tableEntry, i}
-        <div class="table-margin--2">
-          <h3 class="ons-related-links__title ons-u-fs-r--b ons-u-mb-xs">
-            <a href="/{topic.slug}/{tableEntry.slug}/{tableEntry.categories[0].slug}{locationQueryParam}"
-              >{tableEntry.name}</a
-            >
-          </h3>
-          <p class="ons-collapsible__table-description">{tableEntry.desc}</p>
-          <NestableCollapsible id="{tableEntry.slug}-{i}" title={tableEntry.name}>
+{#if topicToDisplay || selectedTopic}
+  <ONSAccordion showAll={false}>
+    {#each $censusMetadata as topic}
+      {#if topic.slug == (topicToDisplay.toLowerCase() || selectedTopic.toLowerCase())}
+        {#each topic.tables as table, i}
+          <ONSAccordionPanel id="table-{i}" title={table.name} noTopBorder description={table.desc}>
             <ul class="ons-list ons-list--bare">
-              {#each tableEntry.categories as category}
+              {#each table.categories as category}
                 <li class="ons-list__item">
-                  <a href="/{topic.slug}/{tableEntry.slug}/{category.slug}{locationQueryParam}" class="ons-list__link"
+                  <a href="/{topic.slug}/{table.slug}/{category.slug}{locationQueryParam}" class="ons-list__link"
                     >{category.name}</a
                   >
                 </li>
               {/each}
             </ul>
-          </NestableCollapsible>
-        </div>
-      {/each}
-    </ONSAccordionPanel>
-  {/each}
-</ONSAccordion>
+          </ONSAccordionPanel>
+        {/each}
+      {/if}
+    {/each}
+  </ONSAccordion>
+{/if}
 
 <style lang="scss">
   @import "../../node_modules/@ons/design-system/scss/vars/_index.scss";
@@ -80,5 +73,8 @@
   }
   a:visited {
     color: $color-indigo-blue;
+  }
+  .ons-list--bare {
+    padding-left: 1.5rem;
   }
 </style>
