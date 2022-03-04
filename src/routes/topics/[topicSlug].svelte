@@ -60,7 +60,11 @@
   <span slot="map">
     <MapWrapper showDataLayer={false} />
   </span>
-
+  <p>
+    Change to a
+    <a href="/topics{locationId ? `?location=${locationId}` : ''}">new topic</a>
+  </p>
+  <hr />
   {#if $appIsInitialised && $censusTableStructureIsLoaded}
     <TopicExplorer {locationId} topicToDisplay={topicSlug} />
   {/if}
@@ -78,6 +82,4 @@
 
 <style lang="scss">
   @import "./../../node_modules/@ons/design-system/scss/vars/_index.scss";
-  @media only screen and (max-width: map-get($grid-bp, s)) {
-  }
 </style>

@@ -26,7 +26,6 @@
 
   function initialisePage() {
     if (locationId) {
-      console.log("hello");
       locationName = getLadName(locationId);
       updateSelectedGeography(locationId);
     }
