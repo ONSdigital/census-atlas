@@ -128,6 +128,22 @@ export async function fetchTableStructure(censusDataService) {
     };
 
     topic.tables.forEach((table) => {
+      let categoriesArray = [];
+      let catCodeList = [];
+      table.categories.forEach((category) => {
+        categoriesArray.push({ code: category.code, name: category.name, slug: category.slug });
+        catCodeList.push(category.code);
+        if ("sub-categories" in category) {
+          category["sub-categories"].forEach((subcategory) => {
+            categoriesArray.push({
+              code: subcategory.code,
+              name: subcategory.name,
+              slug: `${category.slug}/${subcategory.slug}`,
+            });
+            catCodeList.push(subcategory.code);
+          });
+        }
+      });
       tables[table.code] = {
         topic: topic.code,
         code: table.code,
@@ -135,8 +151,8 @@ export async function fetchTableStructure(censusDataService) {
         unit: table.units,
         name: table.name,
         slug: table.slug,
-        categories: table.categories.map((category) => category.code),
-        categoriesArray: table.categories,
+        categories: catCodeList,
+        categoriesArray: categoriesArray,
       };
       categoryCodeLookup[table.slug] = {};
       table.categories.forEach((category) => {
@@ -147,7 +163,26 @@ export async function fetchTableStructure(censusDataService) {
           table: table.code,
           topic: topic.code,
         };
-        categoryCodeLookup[table.slug][category.slug] = category.code;
+        if ("sub-categories" in category) {
+          category["sub-categories"].forEach((subcategory) => {
+            categories[subcategory.code] = {
+              code: subcategory.code,
+              name: subcategory.name,
+              slug: subcategory.slug,
+              category: category.code,
+              table: table.code,
+              topic: topic.code,
+            };
+            categoryCodeLookup = {
+              ...categoryCodeLookup,
+              [table.slug]: { ...categoryCodeLookup[table.slug], [subcategory.slug]: subcategory.code },
+            };
+          });
+        }
+        categoryCodeLookup = {
+          ...categoryCodeLookup,
+          [table.slug]: { ...categoryCodeLookup[table.slug], [category.slug]: category.code },
+        };
       });
     });
   });
