@@ -70,12 +70,6 @@
 
 <style lang="scss">
   @import "../../node_modules/@ons/design-system/scss/vars/_index.scss";
-  .ons-collapsible__table-description {
-    margin: 0 2rem 0 0;
-  }
-  .table-margin--2 {
-    margin: 1rem 0 2rem 0;
-  }
   a:visited {
     color: $color-indigo-blue;
   }
