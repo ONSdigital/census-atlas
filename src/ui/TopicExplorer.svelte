@@ -47,9 +47,9 @@
                     >{category.name}</a
                   >
                 </li>
-                {#if category.subcategories}
+                {#if category["sub-categories"]}
                   <ul class="ons-list ons-list--dashed">
-                    {#each category.subcategories as subcategory}
+                    {#each category["sub-categories"] as subcategory}
                       <li class="ons-list__item">
                         <a
                           href="/{topic.slug}/{table.slug}/{category.slug}/{subcategory.slug}{locationQueryParam}"
