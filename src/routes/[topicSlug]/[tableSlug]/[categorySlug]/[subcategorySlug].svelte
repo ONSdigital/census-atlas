@@ -74,7 +74,7 @@
       locationName = getLadName(locationId);
     }
   }
-  $: category = getCategoryBySlug(tableSlug, categorySlug);
+  $: category = getCategoryBySlug(tableSlug, subcategorySlug);
 
   $: geoCode,
     $appIsInitialised && locationId && (neighbouringLad = returnNeighbouringLad(locationId)),
@@ -100,7 +100,7 @@
     if (locationId != null) {
       neighbouringLad = returnNeighbouringLad(locationId);
     }
-    category = getCategoryBySlug(tableSlug, categorySlug);
+    category = getCategoryBySlug(tableSlug, subcategorySlug);
     table = category ? tables[category.table] : null;
     totalCatCode = table.total;
     fetchMapDataForSelectedCat(category.code, totalCatCode);

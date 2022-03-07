@@ -13,12 +13,12 @@
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
 
-  let { topicSlug, tableSlug, categorySlug } = $page.params;
+  let { topicSlug, tableSlug, subcategorySlug } = $page.params;
 
   let locationId = $page.query.get("location");
   let locationName;
 
-  $: category = getCategoryBySlug(tableSlug, categorySlug);
+  $: category = getCategoryBySlug(tableSlug, subcategorySlug);
 
   $: {
     if ($selectedGeography.lad) {
