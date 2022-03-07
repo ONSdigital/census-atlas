@@ -42,6 +42,11 @@ function buildTotalCatCodeLookup(metadata) {
       if (table.categories != null) {
         table.categories.forEach((category) => {
           lookup[category.code] = table.total.code;
+          if ("sub-categories" in category) {
+            category["sub-categories"].forEach((subcategory) => {
+              lookup[subcategory.code] = table.total.code;
+            });
+          }
         });
       }
     });
@@ -54,7 +59,12 @@ function buildReverseTotalCatCodeLookup(metadata) {
   metadata.forEach((topic) => {
     topic.tables.forEach((table) => {
       if (table.categories != null) {
-        reverseLookup[table.total.code] = table.categories;
+        reverseLookup[table.total.code] = [...table.categories];
+        table.categories.forEach((category) => {
+          if ("sub-categories" in category) {
+            reverseLookup[table.total.code] = [...reverseLookup[table.total.code], ...category["sub-categories"]];
+          }
+        });
       }
     });
   });
