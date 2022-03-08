@@ -59,7 +59,7 @@
   $: {
     locationId = $page.query.get("location");
     geoCode = $page.query.get("location") ? $page.query.get("location") : config.eAndWGeoCode;
-    categorySlug = $page.params.categorySlug;
+    subcategorySlug = $page.params.subcategorySlug;
     updateSelectedGeography(locationId);
     locationName = getLadName(locationId);
     $pageUrl = $page.path + (locationId ? `?location=${locationId}` : "");
@@ -79,7 +79,7 @@
   $: geoCode,
     $appIsInitialised && locationId && (neighbouringLad = returnNeighbouringLad(locationId)),
     fetchSelectedDataset();
-  $: categorySlug,
+  $: subcategorySlug,
     $appIsInitialised && (updateMap(category), ($pageUrl = $page.path + (locationId ? `?location=${locationId}` : "")));
 
   // temporary line to load some data
