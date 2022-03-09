@@ -6,7 +6,7 @@
   import SearchByAreaComponent from "./SearchByAreaComponent.svelte";
   import { reverseLadLookup } from "../model/geography/geography";
 
-  export let locationName, locationId, topicSlug, tableSlug, categorySlug, tableName;
+  export let locationName, locationId, topicSlug, tableSlug, categorySlug, tableName, topicPage;
 
   export let showChangeAreaHeader = false;
   let userInputValue;
@@ -60,5 +60,6 @@
     {topicSlug}
     {categorySlug}
     {tableSlug}
+    {topicPage}
   />
 {/if}
