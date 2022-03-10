@@ -46,7 +46,7 @@
 
 <BasePage>
   <span slot="header" bind:this={header}>
-    <HeaderWrapper topicPage={pageTopic.topicName} bind:showChangeAreaHeader />
+    <HeaderWrapper topicPage={pageTopic.topicName} bind:showChangeAreaHeader changeAreaBaseUrl="/{topicSlug}" />
   </span>
 
   <span slot="map">

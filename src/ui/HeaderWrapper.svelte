@@ -6,7 +6,7 @@
   import SearchByAreaComponent from "./SearchByAreaComponent.svelte";
   import { reverseLadLookup } from "../model/geography/geography";
 
-  export let locationName, locationId, topicSlug, tableSlug, categorySlug, tableName, topicPage;
+  export let locationName, locationId, topicSlug, tableSlug, categorySlug, tableName, topicPage, changeAreaBaseUrl;
 
   export let showChangeAreaHeader = false;
   let userInputValue;
@@ -17,13 +17,9 @@
     showChangeAreaHeader = !showChangeAreaHeader;
   };
 
-  function submitFunction(ladInput) {
+  function submitFunction(ladInput, baseUrl) {
     if (reverseLadLookup[ladInput]) {
-      if (topicSlug) {
-        goto(`/${topicSlug}/${tableSlug}/${categorySlug}?location=${reverseLadLookup[ladInput]}`);
-      } else {
-        goto(`/area?location=${reverseLadLookup[ladInput]}`);
-      }
+      goto(`${baseUrl}?location=${reverseLadLookup[ladInput]}`);
       showChangeAreaHeader = !showChangeAreaHeader;
     } else {
       renderError = true;
@@ -48,7 +44,7 @@
       {invertTextColor}
       header
       bind:userInputValue
-      on:click={() => submitFunction(userInputValue)}
+      on:click={() => submitFunction(userInputValue, changeAreaBaseUrl)}
     />
   </Header>
 {:else}
