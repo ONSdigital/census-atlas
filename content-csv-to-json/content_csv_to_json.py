@@ -11,13 +11,13 @@ from typing import Iterator
 
 TAXONOMIC_ORDER = [
     "topic",
-    "classification",
+    "table",
     "category",
     "sub-category",
 ]
 NESTED_KEYS = {
-    "topic": "classifications",
-    "classification": "categories",
+    "topic": "tables",
+    "table": "categories",
     "category": "sub-categories",
     "sub-category": None
 }
