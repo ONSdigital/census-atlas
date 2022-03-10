@@ -237,7 +237,7 @@
         text: "New category",
         url: locationId ? `/topics/${topicSlug}?location=${locationId}` : `/topics/${topicSlug}`,
       }}
-      secondLink={{ text: "New location", url: "" }}
+      secondLink={{ text: locationId ? "New location" : "Choose location", url: "" }}
       on:click={() => ((showChangeAreaHeader = true), header.scrollIntoView())}
     />
   </div>

@@ -72,12 +72,14 @@
     </p>
   </Topic>
 
-  <ONSShare title="Share this page" pageURL={location.href} pageTitle={document.title} multiRow>
-    <ONSShareItem facebook shareText="Facebook"><ONSFacebookIcon /></ONSShareItem>
-    <ONSShareItem twitter shareText="Twitter"><ONSTwitterIcon /></ONSShareItem>
-    <ONSShareItem linkedin shareText="Linkedin"><ONSLinkedinIcon /></ONSShareItem>
-    <ONSShareItem email shareText="Email"><ONSEmailIcon /></ONSShareItem>
-  </ONSShare>
+  <div class="ons-u-mb-l">
+    <ONSShare title="Share this page" pageURL={location.href} pageTitle={document.title} multiRow>
+      <ONSShareItem facebook shareText="Facebook"><ONSFacebookIcon /></ONSShareItem>
+      <ONSShareItem twitter shareText="Twitter"><ONSTwitterIcon /></ONSShareItem>
+      <ONSShareItem linkedin shareText="Linkedin"><ONSLinkedinIcon /></ONSShareItem>
+      <ONSShareItem email shareText="Email"><ONSEmailIcon /></ONSShareItem>
+    </ONSShare>
+  </div>
 
   <div class="ons-u-mb-l">
     <ExploreSomethingElseNav
