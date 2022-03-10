@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import argparse
+import datetime
 import json
 import pathlib
 import re
@@ -70,7 +72,7 @@ def process_census_content(rows: list[dict], i: int) -> (dict, int):
     return content, i
 
 
-def main(fp: pathlib.PurePath):
+def main(fp: pathlib.PurePath, no_metadata=False):
     with open(fp) as f:
         # filter code-less rows out here:
         rows = []
@@ -79,21 +81,34 @@ def main(fp: pathlib.PurePath):
                 print(f"Ignoring {row['taxonomy']} with no code: {row['name']}")
                 continue
             rows.append(row)
-        output = {
-            "meta": {
-                "source": fp.name,
-            },
-            "content": []
-        }
+        
+        # populate content
+        content = []
         i = 0
         while i < len(rows):
-            content, i = process_census_content(rows, i)
-            output["content"].append(content)
-      
+            new_content, i = process_census_content(rows, i)
+            content.append(new_content)
+        
+        # collate output
+        if no_metadata:
+            output = content
+        else:
+            output = {
+                "meta": {
+                    "source": fp.name,
+                    "utc_created_at": datetime.datetime.utcnow().isoformat()
+                },
+                "content": content
+            }
+
     with open(fp.with_suffix(".content.json"), 'w') as f:
        json.dump(output, f, indent=2)
 
 
 if __name__=="__main__":
-    fp = pathlib.PurePath(sys.argv[1])
-    main(fp)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("fp", type=str, help="String, filepath for csv file to create content JSON from.")
+    parser.add_argument("--no-metadata", default=False, action="store_true", help="Do not append metadata to content JSON (default True)")
+    args = parser.parse_args()
+    fp = pathlib.PurePath(args.fp)
+    main(fp, args.no_metadata)

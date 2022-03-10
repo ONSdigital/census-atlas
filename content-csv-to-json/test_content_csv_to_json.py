@@ -33,112 +33,108 @@ class TestContentCsvToJson(TestCase):
 
 
     def test_content_csv_to_json_OK_one_topic_no_subcategories(self):
-        # GIVEN we have written a csv with one topic and two classifications, each with two categories and one total
+        # GIVEN we have written a csv with one topic and two tables, each with two categories and one total
         self.write_test_CSV([
             ["code","taxonomy","display taxonomy","name","desc","units"],
             ["1", "topic","topic", "Topic 1", "Topic 1 desc.", ""],
-            ["1_1", "classification","category", "Class 1_1", "Class 1_1 desc.", "units_1"],
+            ["1_1", "table","category", "Class 1_1", "Class 1_1 desc.", "units_1"],
             ["1_1_0001", "category","subject", "Cat 1_1_0001", "Cat 1_1_0001 desc.", ""],
             ["1_1_0002", "category","subject", "Cat 1_1_0002", "Cat 1_1_0002 desc.", ""],
             ["1_1_0003", "category","subject", "Cat 1_1_0003", "Cat 1_1_0003 desc.", ""],
-            ["1_2", "classification","category", "Class 1_2", "Class 1_2 desc.", "units_2"],
+            ["1_2", "table","category", "Class 1_2", "Class 1_2 desc.", "units_2"],
             ["1_2_0001", "category","subject", "Cat 1_2_0001", "Cat 1_2_0001 desc.", ""],
             ["1_2_0002", "category","subject", "Cat 1_2_0002", "Cat 1_2_0002 desc.", ""],
             ["1_2_0003", "category","subject", "Cat 1_2_0003", "Cat 1_2_0003 desc.", ""],
         ])
        
         # WHEN we run the content_csv_to_json script
-        os.system(f"./content_csv_to_json.py {self.test_fp}")
+        os.system(f"./content_csv_to_json.py {self.test_fp} --no-metadata")
 
         # THEN we expect to get a properly formatted JSON back
-        expected = {
-            "meta": {
-                "source": self.test_fn
-            },
-            "content": [
-                {
-                    "code": "1",
-                    "name": "Topic 1",
-                    "slug": "topic-1",
-                    "desc": "Topic 1 desc.",
-                    "display_taxonomy": "topic",
-                    "classifications": [
-                        {
-                            "code": "1_1",
-                            "name": "Class 1_1",
-                            "slug": "class-1-1",
-                            "desc": "Class 1_1 desc.",
-                            "units": "units_1",
-                            "display_taxonomy": "category",
-                            "total": {
-                                "code": "1_1_0001",
-                                "name": "Cat 1_1_0001",
-                                "slug": "cat-1-1-0001",
-                                "desc": "Cat 1_1_0001 desc.",
+        expected = [
+            {
+                "code": "1",
+                "name": "Topic 1",
+                "slug": "topic-1",
+                "desc": "Topic 1 desc.",
+                "display_taxonomy": "topic",
+                "tables": [
+                    {
+                        "code": "1_1",
+                        "name": "Class 1_1",
+                        "slug": "class-1-1",
+                        "desc": "Class 1_1 desc.",
+                        "units": "units_1",
+                        "display_taxonomy": "category",
+                        "total": {
+                            "code": "1_1_0001",
+                            "name": "Cat 1_1_0001",
+                            "slug": "cat-1-1-0001",
+                            "desc": "Cat 1_1_0001 desc.",
+                            "display_taxonomy": "subject",
+                        },
+                        "categories": [
+                            {
+                                "code": "1_1_0002",
+                                "name": "Cat 1_1_0002",
+                                "slug": "cat-1-1-0002",
+                                "desc": "Cat 1_1_0002 desc.",
                                 "display_taxonomy": "subject",
                             },
-                            "categories": [
-                                {
-                                    "code": "1_1_0002",
-                                    "name": "Cat 1_1_0002",
-                                    "slug": "cat-1-1-0002",
-                                    "desc": "Cat 1_1_0002 desc.",
-                                    "display_taxonomy": "subject",
-                                },
-                                {
-                                    "code": "1_1_0003",
-                                    "name": "Cat 1_1_0003",
-                                    "slug": "cat-1-1-0003",
-                                    "desc": "Cat 1_1_0003 desc.",
-                                    "display_taxonomy": "subject"
-                                },
-                            ]
+                            {
+                                "code": "1_1_0003",
+                                "name": "Cat 1_1_0003",
+                                "slug": "cat-1-1-0003",
+                                "desc": "Cat 1_1_0003 desc.",
+                                "display_taxonomy": "subject"
+                            },
+                        ]
+                    },
+                    {
+                        "code": "1_2",
+                        "name": "Class 1_2",
+                        "slug": "class-1-2",
+                        "desc": "Class 1_2 desc.",
+                        "units": "units_2",
+                        "display_taxonomy": "category",
+                        "total": {
+                            "code": "1_2_0001",
+                            "name": "Cat 1_2_0001",
+                            "slug": "cat-1-2-0001",
+                            "desc": "Cat 1_2_0001 desc.",
+                            "display_taxonomy": "subject",
                         },
-                        {
-                            "code": "1_2",
-                            "name": "Class 1_2",
-                            "slug": "class-1-2",
-                            "desc": "Class 1_2 desc.",
-                            "units": "units_2",
-                            "display_taxonomy": "category",
-                            "total": {
-                                "code": "1_2_0001",
-                                "name": "Cat 1_2_0001",
-                                "slug": "cat-1-2-0001",
-                                "desc": "Cat 1_2_0001 desc.",
+                        "categories": [
+                            {
+                                "code": "1_2_0002",
+                                "name": "Cat 1_2_0002",
+                                "slug": "cat-1-2-0002",
+                                "desc": "Cat 1_2_0002 desc.",
                                 "display_taxonomy": "subject",
                             },
-                            "categories": [
-                                {
-                                    "code": "1_2_0002",
-                                    "name": "Cat 1_2_0002",
-                                    "slug": "cat-1-2-0002",
-                                    "desc": "Cat 1_2_0002 desc.",
-                                    "display_taxonomy": "subject",
-                                },
-                                {
-                                    "code": "1_2_0003",
-                                    "name": "Cat 1_2_0003",
-                                    "slug": "cat-1-2-0003",
-                                    "desc": "Cat 1_2_0003 desc.",
-                                    "display_taxonomy": "subject"
-                                },
-                            ]
-                        },
-                    ]
-                }
-            ]
-        }
+                            {
+                                "code": "1_2_0003",
+                                "name": "Cat 1_2_0003",
+                                "slug": "cat-1-2-0003",
+                                "desc": "Cat 1_2_0003 desc.",
+                                "display_taxonomy": "subject"
+                            },
+                        ]
+                    },
+                ]
+            }
+        ]
+
         returned = self.read_test_JSON()
         self.assertEqual(expected, returned)
 
     def test_content_csv_to_json_OK_subcategories(self):
-        # GIVEN we have written a csv with one topic and one classification with one category, one total and two 
+        # GIVEN we have written a csv with one topic and one table with one category, one total and two 
         # two subcategories
         self.write_test_CSV([
             ["code","taxonomy","display taxonomy","name","desc","units"],
             ["1", "topic","topic", "Topic 1", "Topic 1 desc.", ""],
-            ["1_1", "classification","category", "Class 1_1", "Class 1_1 desc.", "units_1"],
+            ["1_1", "table","category", "Class 1_1", "Class 1_1 desc.", "units_1"],
             ["1_1_0001", "category","subject", "Cat 1_1_0001", "Cat 1_1_0001 desc.", ""],
             ["1_1_0002", "category","subject", "Cat 1_1_0002", "Cat 1_1_0002 desc.", ""],
             ["1_1_0002_1", "sub-category","sub-subject", "Sub-Cat 1_1_0002_1", "Sub-Cat 1_1_0002_1 desc.", ""],
@@ -146,166 +142,173 @@ class TestContentCsvToJson(TestCase):
         ])
        
         # WHEN we run the content_csv_to_json script
-        os.system(f"./content_csv_to_json.py {self.test_fp}")
+        os.system(f"./content_csv_to_json.py {self.test_fp} --no-metadata")
 
         # THEN we expect to get a properly formatted JSON back
-        expected = {
-            "meta": {
-                "source": self.test_fn
-            },
-            "content": [
-                {
-                    "code": "1",
-                    "name": "Topic 1",
-                    "slug": "topic-1",
-                    "desc": "Topic 1 desc.",
-                    "display_taxonomy": "topic",
-                    "classifications": [
-                        {
-                            "code": "1_1",
-                            "name": "Class 1_1",
-                            "slug": "class-1-1",
-                            "desc": "Class 1_1 desc.",
-                            "units": "units_1",
-                            "display_taxonomy": "category",
-                            "total": {
-                                "code": "1_1_0001",
-                                "name": "Cat 1_1_0001",
-                                "slug": "cat-1-1-0001",
-                                "desc": "Cat 1_1_0001 desc.",
+        expected = [
+            {
+                "code": "1",
+                "name": "Topic 1",
+                "slug": "topic-1",
+                "desc": "Topic 1 desc.",
+                "display_taxonomy": "topic",
+                "tables": [
+                    {
+                        "code": "1_1",
+                        "name": "Class 1_1",
+                        "slug": "class-1-1",
+                        "desc": "Class 1_1 desc.",
+                        "units": "units_1",
+                        "display_taxonomy": "category",
+                        "total": {
+                            "code": "1_1_0001",
+                            "name": "Cat 1_1_0001",
+                            "slug": "cat-1-1-0001",
+                            "desc": "Cat 1_1_0001 desc.",
+                            "display_taxonomy": "subject",
+                        },
+                        "categories": [
+                            {
+                                "code": "1_1_0002",
+                                "name": "Cat 1_1_0002",
+                                "slug": "cat-1-1-0002",
+                                "desc": "Cat 1_1_0002 desc.",
                                 "display_taxonomy": "subject",
+                                "sub-categories": [
+                                    {
+                                        "code": "1_1_0002_1",
+                                        "name": "Sub-Cat 1_1_0002_1",
+                                        "slug": "sub-cat-1-1-0002-1",
+                                        "desc": "Sub-Cat 1_1_0002_1 desc.",
+                                        "display_taxonomy": "sub-subject"
+                                    },
+                                    {
+                                        "code": "1_1_0002_2",
+                                        "name": "Sub-Cat 1_1_0002_2",
+                                        "slug": "sub-cat-1-1-0002-2",
+                                        "desc": "Sub-Cat 1_1_0002_2 desc.",
+                                        "display_taxonomy": "sub-subject"
+                                    },
+                                    
+                                ]
                             },
-                            "categories": [
-                                {
-                                    "code": "1_1_0002",
-                                    "name": "Cat 1_1_0002",
-                                    "slug": "cat-1-1-0002",
-                                    "desc": "Cat 1_1_0002 desc.",
-                                    "display_taxonomy": "subject",
-                                    "sub-categories": [
-                                        {
-                                            "code": "1_1_0002_1",
-                                            "name": "Sub-Cat 1_1_0002_1",
-                                            "slug": "sub-cat-1-1-0002-1",
-                                            "desc": "Sub-Cat 1_1_0002_1 desc.",
-                                            "display_taxonomy": "sub-subject"
-                                        },
-                                        {
-                                            "code": "1_1_0002_2",
-                                            "name": "Sub-Cat 1_1_0002_2",
-                                            "slug": "sub-cat-1-1-0002-2",
-                                            "desc": "Sub-Cat 1_1_0002_2 desc.",
-                                            "display_taxonomy": "sub-subject"
-                                        },
-                                        
-                                    ]
-                                },
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
+                        ]
+                    }
+                ]
+            }
+        ]
         returned = self.read_test_JSON()
         self.assertEqual(expected, returned)
 
     def test_content_csv_to_json_blank_cat_desc_placeholder(self):
-        # GIVEN we have written a csv with one topic and one classification with one category, with blank desc values
+        # GIVEN we have written a csv with one topic and one table with one category, with blank desc values
         self.write_test_CSV([
             ["code","taxonomy","display taxonomy","name","desc","units"],
             ["1", "topic","topic", "Topic 1", "", ""],
-            ["1_1", "classification","category", "Class 1_1", "", "units_1"],
+            ["1_1", "table","category", "Class 1_1", "", "units_1"],
             ["1_1_0002", "category","subject", "Cat 1_1_0002", "", ""]
         ])
         
         # WHEN we run the content_csv_to_json script
-        os.system(f"./content_csv_to_json.py {self.test_fp}")
+        os.system(f"./content_csv_to_json.py {self.test_fp} --no-metadata")
 
         # THEN we expect to get a properly formatted JSON back, with lorem ipsum placeholder descriptions
-        expected = {
-            "meta": {
-                "source": self.test_fn
-            },
-            "content": [
-                {
-                    "code": "1",
-                    "name": "Topic 1",
-                    "slug": "topic-1",
-                    "desc": content_csv_to_json.DESC_PLACEHOLDER,
-                    "display_taxonomy": "topic",
-                    "classifications": [
-                        {
-                            "code": "1_1",
-                            "name": "Class 1_1",
-                            "slug": "class-1-1",
-                            "desc": content_csv_to_json.DESC_PLACEHOLDER,
-                            "units": "units_1",
-                            "display_taxonomy": "category",
-                            "categories": [
-                                {
-                                    "code": "1_1_0002",
-                                    "name": "Cat 1_1_0002",
-                                    "slug": "cat-1-1-0002",
-                                    "desc": content_csv_to_json.DESC_PLACEHOLDER,
-                                    "display_taxonomy": "subject"
-                                },
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
+        expected = [
+            {
+                "code": "1",
+                "name": "Topic 1",
+                "slug": "topic-1",
+                "desc": content_csv_to_json.DESC_PLACEHOLDER,
+                "display_taxonomy": "topic",
+                "tables": [
+                    {
+                        "code": "1_1",
+                        "name": "Class 1_1",
+                        "slug": "class-1-1",
+                        "desc": content_csv_to_json.DESC_PLACEHOLDER,
+                        "units": "units_1",
+                        "display_taxonomy": "category",
+                        "categories": [
+                            {
+                                "code": "1_1_0002",
+                                "name": "Cat 1_1_0002",
+                                "slug": "cat-1-1-0002",
+                                "desc": content_csv_to_json.DESC_PLACEHOLDER,
+                                "display_taxonomy": "subject"
+                            },
+                        ]
+                    }
+                ]
+            }
+        ]
+
         returned = self.read_test_JSON()
         self.assertEqual(expected, returned)
 
 
     def test_content_csv_to_json_ignores_content_with_no_code(self):
-        # GIVEN we have written a csv with one topic and two classifications with one category, one set with blank codes
+        # GIVEN we have written a csv with one topic and two tables with one category, one set with blank codes
         self.write_test_CSV([
             ["code","taxonomy","display taxonomy","name","desc","units"],
             ["1", "topic","topic", "Topic 1", "Topic 1 desc.", ""],
-            ["1_1", "classification","category", "Class 1_1", "Class 1_1 desc.", "units_1"],
+            ["1_1", "table","category", "Class 1_1", "Class 1_1 desc.", "units_1"],
             ["1_1_0002", "category","subject", "Cat 1_1_0002", "Cat 1_1_0002 desc.", ""],
-            ["", "classification","category", "Class 1_2", "Class 1_2 desc.", "units_2"],
+            ["", "table","category", "Class 1_2", "Class 1_2 desc.", "units_2"],
             ["", "category","subject", "Cat 1_2_0002", "Cat 1_1_0002 desc.", ""]
         ])
         
         # WHEN we run the content_csv_to_json script
-        os.system(f"./content_csv_to_json.py {self.test_fp}")
+        os.system(f"./content_csv_to_json.py {self.test_fp} --no-metadata")
 
         # THEN we expect to get a properly formatted JSON back, with the blank code entries ignored
-        expected = {
-            "meta": {
-                "source": self.test_fn
-            },
-            "content": [
-                {
-                    "code": "1",
-                    "name": "Topic 1",
-                    "slug": "topic-1",
-                    "desc": "Topic 1 desc.",
-                    "display_taxonomy": "topic",
-                    "classifications": [
-                        {
-                            "code": "1_1",
-                            "name": "Class 1_1",
-                            "slug": "class-1-1",
-                            "desc": "Class 1_1 desc.",
-                            "units": "units_1",
-                            "display_taxonomy": "category",
-                            "categories": [
-                                {
-                                    "code": "1_1_0002",
-                                    "name": "Cat 1_1_0002",
-                                    "slug": "cat-1-1-0002",
-                                    "desc": "Cat 1_1_0002 desc.",
-                                    "display_taxonomy": "subject"
-                                },
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
+        expected = [
+            {
+                "code": "1",
+                "name": "Topic 1",
+                "slug": "topic-1",
+                "desc": "Topic 1 desc.",
+                "display_taxonomy": "topic",
+                "tables": [
+                    {
+                        "code": "1_1",
+                        "name": "Class 1_1",
+                        "slug": "class-1-1",
+                        "desc": "Class 1_1 desc.",
+                        "units": "units_1",
+                        "display_taxonomy": "category",
+                        "categories": [
+                            {
+                                "code": "1_1_0002",
+                                "name": "Cat 1_1_0002",
+                                "slug": "cat-1-1-0002",
+                                "desc": "Cat 1_1_0002 desc.",
+                                "display_taxonomy": "subject"
+                            },
+                        ]
+                    }
+                ]
+            }
+        ]
+
         returned = self.read_test_JSON()
         self.assertEqual(expected, returned)
+
+    def test_content_csv_to_json_writes_metadata(self):
+        # GIVEN we have written a csv with one topic and two tables with one category, one set with blank codes
+        self.write_test_CSV([
+            ["code","taxonomy","display taxonomy","name","desc","units"],
+            ["1", "topic","topic", "Topic 1", "Topic 1 desc.", ""],
+            ["1_1", "table","category", "Class 1_1", "Class 1_1 desc.", "units_1"],
+            ["1_1_0002", "category","subject", "Cat 1_1_0002", "Cat 1_1_0002 desc.", ""],
+            ["", "table","category", "Class 1_2", "Class 1_2 desc.", "units_2"],
+            ["", "category","subject", "Cat 1_2_0002", "Cat 1_1_0002 desc.", ""]
+        ])
+
+        # WHEN we run the content_csv_to_json script WITHOUT the no-metadata flag
+        os.system(f"./content_csv_to_json.py {self.test_fp}")
+
+        # THEN we expect to get a meta key back, with a filepath equal to that called and a timestamp 
+        returned = self.read_test_JSON()
+        self.assertTrue("meta" in returned)
+        self.assertEqual(returned["meta"]["source"], self.test_fn)
+        self.assertTrue("utc_created_at" in returned["meta"])
