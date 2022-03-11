@@ -50,13 +50,17 @@ def process_census_content(rows: list[dict], i: int) -> (dict, int):
         "name": row["name"],
         "desc": DESC_PLACEHOLDER if row["desc"] == "" else row["desc"],
         "slug": slugify(row["name"]),
-        "display_taxonomy": row["display taxonomy"]
+        # "display_taxonomy": row["display taxonomy"]
     }
 
     # append units if present
     if row["units"] != "":
         content["units"] = row["units"]
     
+    # all tables should have units!
+    if row["taxonomy"] == "table" and row["units"] == "":
+        raise Exception(f"Table definition does not include units! {row}")
+
     # deal with nested content using lookahead
     i+=1
     nested_key = NESTED_KEYS[row["taxonomy"]]
