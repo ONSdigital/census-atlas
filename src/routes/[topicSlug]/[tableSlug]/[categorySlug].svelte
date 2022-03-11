@@ -216,11 +216,15 @@
   {/if}
 
   {#if table && tableDataFetched}
-    <CensusTableByLocation {table} {geoCode} />
+    <div class="ons-u-mb-s">
+      <CensusTableByLocation {table} {geoCode} {locationId} />
+    </div>
   {/if}
 
   <div class="ons-u-mb-l">
-    <UseCensusData />
+    <hr class="separator separator__top" />
+    <UseCensusData displayTitle={false} />
+    <hr class="separator separator__bottom" />
   </div>
 
   <div class="ons-u-mb-l">
@@ -266,5 +270,15 @@
       bottom: auto;
       top: 120px;
     }
+  }
+
+  .separator {
+    margin: 0.5rem 0 0.5rem;
+  }
+  .separator__top {
+    border-top: 1px solid #bcbcbd;
+  }
+  .separator__bottom {
+    border-top: 3px solid #222222;
   }
 </style>
