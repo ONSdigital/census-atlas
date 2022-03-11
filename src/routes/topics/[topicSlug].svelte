@@ -1,6 +1,6 @@
 <script>
   import BasePage from "../../ui/BasePage.svelte";
-  import Header from "../../ui/Header.svelte";
+  import HeaderWrapper from "../../ui/HeaderWrapper.svelte";
   import MapWrapper from "../../ui/map/MapWrapper.svelte";
   import TopicExplorer from "../../ui/TopicExplorer.svelte";
   import Feedback from "../../ui/Feedback.svelte";
@@ -15,6 +15,7 @@
   let locationName, header;
   let { topicSlug } = $page.params;
   let showChangeAreaHeader = false;
+
   $: {
     if ($selectedGeography.lad) {
       $page.query.set("location", $selectedGeography.lad);
@@ -42,13 +43,11 @@
 
 <BasePage mobileMap={false} withoutBackground>
   <span slot="header" bind:this={header}>
-    <Header
-      ONSBacklinkHref={$pageUrl}
-      showBackLink
-      serviceTitle="Choose a category {locationId ? `for ${locationName}` : ''}"
-      description="Choose a category and select an option within it to explore {locationName
-        ? `${locationName}'s`
-        : 'Census'} data."
+    <HeaderWrapper
+      {locationName}
+      {locationId}
+      {topicSlug}
+      changeAreaBaseUrl="/topics/{topicSlug}"
       bind:showChangeAreaHeader
     />
   </span>

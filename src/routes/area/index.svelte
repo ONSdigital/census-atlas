@@ -58,7 +58,7 @@
 
 <BasePage>
   <span slot="header" bind:this={header}>
-    <HeaderWrapper {locationName} {locationId} bind:showChangeAreaHeader />
+    <HeaderWrapper {locationName} {locationId} bind:showChangeAreaHeader changeAreaBaseUrl="/area" />
   </span>
 
   <span slot="map">

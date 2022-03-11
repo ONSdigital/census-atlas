@@ -4,7 +4,7 @@
   import Header from "./Header.svelte";
   import DataHeader from "./DataHeader.svelte";
   import SearchByAreaComponent from "./SearchByAreaComponent.svelte";
-  import { reverseLadLookup } from "../model/geography/geography";
+  import { reverseLadLookup, updateSelectedGeography } from "../model/geography/geography";
 
   export let locationName, locationId, topicSlug, tableSlug, categorySlug, tableName, topicPage, changeAreaBaseUrl;
 
@@ -20,6 +20,7 @@
   function submitFunction(ladInput, baseUrl) {
     if (reverseLadLookup[ladInput]) {
       goto(`${baseUrl}?location=${reverseLadLookup[ladInput]}`);
+      updateSelectedGeography(reverseLadLookup[ladInput]);
       showChangeAreaHeader = !showChangeAreaHeader;
     } else {
       renderError = true;

@@ -40,7 +40,7 @@
 
 <BasePage mobileMap={false} withoutBackground>
   <span slot="header" bind:this={header}>
-    <HeaderWrapper {locationName} {locationId} bind:showChangeAreaHeader />
+    <HeaderWrapper {locationName} {locationId} bind:showChangeAreaHeader changeAreaBaseUrl="/topics" />
   </span>
 
   <div class="ons-u-mb-xl">

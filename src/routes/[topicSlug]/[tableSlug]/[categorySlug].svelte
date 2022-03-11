@@ -159,6 +159,7 @@
       {tableSlug}
       {categorySlug}
       tableName={table ? table.name : null}
+      changeAreaBaseUrl="/{topicSlug}/{tableSlug}/{categorySlug}"
       bind:showChangeAreaHeader
     />
   </span>
