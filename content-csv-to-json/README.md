@@ -9,11 +9,11 @@ This script creates a JSON file that is bundled with the app.
 
 ## Dependencies
 
-Requires Python 3.9+ to be available as the default `Python` executable in the current environment. Can be installed as follows (macOS):
+Requires Python 3.9+ to be available as the default `Python` executable in the current environment. Can be installed and set as the local python as follows (macOS):
 
 - brew install pyenv
 - pyenv install 3.10.0
-- pyenv local 3.10.0
+- cd content-csv-to-json && pyenv local 3.10.0
 
 ## Instructions
 
