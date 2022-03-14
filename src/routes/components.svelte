@@ -15,7 +15,6 @@
   import DesignSystemCode from "./../ui/DesignSystemCode.svelte";
   import CensusTableByLocation from "./../ui/CensusTableByLocation.svelte";
   import Header from "./../ui/Header.svelte";
-  import DataHeader from "./../ui/DataHeader.svelte";
   import ONSShare from "./../ui/ons/ONSShare.svelte";
   import ONSShareItem from "./../ui/ons/partials/ONSShareItem.svelte";
   import ONSFacebookIcon from "./../ui/ons/svg/ONSFacebookIcon.svelte";
@@ -84,14 +83,6 @@
       serviceTitle="Explore Census"
       description="Use our interactive map to find out what people's lives are like across England and Wales."
     />
-  </DesignSystemPanel>
-
-  <DesignSystemPanel title="By category header" code={`<DataHeader tableName="General Health"/>`}>
-    <DataHeader tableName="General Health" />
-  </DesignSystemPanel>
-
-  <DesignSystemPanel title="By location header" code={`<DataHeader location={mapLocation}/>`}>
-    <DataHeader location={mapLocation} />
   </DesignSystemPanel>
 
   <DesignSystemPanel

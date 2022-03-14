@@ -6,7 +6,8 @@
   import Return from "../../ui/Return.svelte";
   import { pageUrl } from "../../stores";
   import MapWrapper from "../../ui/map/MapWrapper.svelte";
-  import HeaderWrapper from "../../ui/HeaderWrapper.svelte";
+  import ChangeLocation from "../../ui/ChangeLocation/ChangeLocation.svelte";
+  import Header from "../../ui/Header.svelte";
   import config from "../../config";
   import TopicList from "../../ui/TopicList.svelte";
   import ExploreSomethingElseNav from "../../ui/ExploreSomethingElseNav/ExploreSomethingElseNav.svelte";
@@ -16,7 +17,7 @@
 
   let locationId = $page.query.get("location");
   let locationName, header;
-  let showChangeAreaHeader = false;
+  let showChangeLocation = false;
 
   $: {
     locationId = $page.query.get("location");
@@ -48,12 +49,17 @@
     {/if}
   </span>
   <span slot="header" bind:this={header}>
-    <HeaderWrapper
-      bind:showChangeAreaHeader
-      changeAreaBaseUrl="/topics"
-      serviceTitle={`Select a topic to explore census results for ${locationId ? locationName : "England and Wales"}`}
-      renderEnglandWalesData={false}
-    />
+    {#if showChangeLocation}
+      <ChangeLocation
+        {locationId}
+        changeAreaBaseUrl="/topics"
+        onClose={() => (showChangeLocation = !showChangeLocation)}
+      />
+    {:else}
+      <Header
+        serviceTitle={`Select a topic to explore census results for ${locationId ? locationName : "England and Wales"}`}
+      />
+    {/if}
   </span>
 
   <div class="ons-u-mb-xl">
@@ -67,7 +73,7 @@
   <div class="ons-u-mb-l">
     <ExploreSomethingElseNav
       secondLink={{ text: locationId ? "New location" : "Choose location", url: "" }}
-      on:click={() => ((showChangeAreaHeader = true), header.scrollIntoView())}
+      on:click={() => ((showChangeLocation = true), header.scrollIntoView())}
     />
   </div>
 </BasePage>

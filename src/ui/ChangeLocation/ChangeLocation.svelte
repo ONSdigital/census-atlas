@@ -61,7 +61,13 @@
     {#if locationId}
       <div class="all-link">
         <p>
-          <a {href} on:click={onClose}>See data for all England and Wales</a>
+          <a
+            {href}
+            on:click={() => {
+              updateSelectedGeography("");
+              onClose();
+            }}>See data for all England and Wales</a
+          >
         </p>
       </div>
     {/if}
