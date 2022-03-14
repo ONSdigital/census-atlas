@@ -12,6 +12,7 @@
   import { pageUrl } from "../../../../stores";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
+  import { returnCorrectArticle } from "../../../../utils";
   let { topicSlug, tableSlug, categorySlug } = $page.params;
   let locationId = $page.query.get("location");
   let locationName, header;
@@ -54,7 +55,9 @@
       {topicSlug}
       changeAreaBaseUrl="/topics/{topicSlug}/{tableSlug}/{categorySlug}"
       bind:showChangeAreaHeader
-      serviceTitle={`Select a ${topicName} category to explore in ${locationId ? locationName : "England and Wales"}`}
+      serviceTitle={`Select ${returnCorrectArticle(topicName)} ${topicName} category to explore in ${
+        locationId ? locationName : "England and Wales"
+      }`}
       renderEnglandWalesData={false}
     />
   </span>
