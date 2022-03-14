@@ -1,21 +1,10 @@
 <script>
-  import ONSBacklink from "./ons/ONSBacklink.svelte";
-  import { page } from "$app/stores";
-  import { updateSelectedGeography } from "../model/geography/geography";
-  export let serviceTitle, description, showChangeAreaHeader;
-  export let showBackLink = false;
-  export let renderEnglandWalesData = true;
-  export let ONSBacklinkHref;
-
-  $: href = $page.path;
+  export let serviceTitle, description;
 </script>
 
 <header class="ons-header ons-header--hero" role="banner">
   <div class="ons-header__main {description ? 'ons-header__main--with-description' : ''}">
     <div class="ons-container">
-      {#if showBackLink}
-        <ONSBacklink href={ONSBacklinkHref} inverted on:click={() => (showChangeAreaHeader = false)} />
-      {/if}
       <div
         class="ons-grid ons-grid--gutterless ons-grid--flex ons-grid--between ons-grid--vertical-center ons-grid--no-wrap"
       >
@@ -23,22 +12,10 @@
           <div class="ons-header__title {description ? 'header__title--with-description' : ''}">
             <h1>{serviceTitle}</h1>
           </div>
-
-          {#if !description && renderEnglandWalesData}
-            <slot />
-            <p>
-              <a
-                {href}
-                on:click={() => {
-                  updateSelectedGeography(""), (showChangeAreaHeader = false);
-                }}>See data for all England and Wales</a
-              >
-            </p>
-          {/if}
         </div>
       </div>
       {#if description}
-        <p class="ons-header__desc">In {description}</p>
+        <p class="ons-header__desc">{description}</p>
       {/if}
     </div>
   </div>

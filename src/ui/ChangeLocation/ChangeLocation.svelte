@@ -51,7 +51,7 @@
       <h1>Search by area</h1>
     </div>
     <SearchByAreaComponent
-      labelText="Enter a region, county, local council or city."
+      labelText="Enter a local council."
       {renderError}
       {invertTextColor}
       header
@@ -61,7 +61,13 @@
     {#if locationId}
       <div class="all-link">
         <p>
-          <a {href} on:click={onClose}>See data for all England and Wales</a>
+          <a
+            {href}
+            on:click={() => {
+              updateSelectedGeography("");
+              onClose();
+            }}>See data for all England and Wales</a
+          >
         </p>
       </div>
     {/if}
