@@ -15,7 +15,6 @@
   import DesignSystemCode from "./../ui/DesignSystemCode.svelte";
   import CensusTableByLocation from "./../ui/CensusTableByLocation.svelte";
   import Header from "./../ui/Header.svelte";
-  import DataHeader from "./../ui/DataHeader.svelte";
   import ONSShare from "./../ui/ons/ONSShare.svelte";
   import ONSShareItem from "./../ui/ons/partials/ONSShareItem.svelte";
   import ONSFacebookIcon from "./../ui/ons/svg/ONSFacebookIcon.svelte";
