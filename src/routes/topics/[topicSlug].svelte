@@ -31,7 +31,14 @@
       updateSelectedGeography(locationId);
     }
   }
-  let topicName=topicSlug.replace("-"," ")
+  let topicName = topicSlug.replace("-", " ");
+  function returnCorrectArticle() {
+    if (/[aeiouAEIOU]/.test(topicName.charAt(0))) {
+      return "an";
+    } else {
+      return "a";
+    }
+  }
 </script>
 
 <svelte:window />
@@ -47,7 +54,9 @@
       {topicSlug}
       changeAreaBaseUrl="/topics/{topicSlug}"
       bind:showChangeAreaHeader
-      serviceTitle={`Select a ${topicName} category to explore in ${locationId ? locationName : "England and Wales"}`}
+      serviceTitle={`Select ${returnCorrectArticle()} ${topicName} category to explore in ${
+        locationId ? locationName : "England and Wales"
+      }`}
       renderEnglandWalesData={false}
     />
   </span>
