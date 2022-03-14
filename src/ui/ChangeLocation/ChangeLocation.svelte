@@ -10,10 +10,7 @@
   let renderError = false;
   let invertTextColor = true;
 
-  $: href = `${$page.path}/`;
-  $: {
-    console.log(href);
-  }
+  $: href = $page.path;
 
   function submitFunction(ladInput, baseUrl) {
     if (reverseLadLookup[ladInput]) {
@@ -63,7 +60,6 @@
     />
     {#if locationId}
       <div class="all-link">
-        <span>{href}</span>
         <p>
           <a
             {href}
