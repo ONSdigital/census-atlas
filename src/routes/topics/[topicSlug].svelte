@@ -33,6 +33,13 @@
     }
   }
   let topicName = topicSlug.replace("-", " ");
+  function returnCorrectArticle() {
+    if (/[aeiouAEIOU]/.test(topicName.charAt(0))) {
+      return "an";
+    } else {
+      return "a";
+    }
+  }
 </script>
 
 <svelte:window />
@@ -50,7 +57,9 @@
       />
     {:else}
       <Header
-        serviceTitle={`Select a ${topicName} category to explore in ${locationId ? locationName : "England and Wales"}`}
+        serviceTitle={`Select ${returnCorrectArticle()} ${topicName} category to explore in ${
+          locationId ? locationName : "England and Wales"
+        }`}
       />
     {/if}
   </span>
