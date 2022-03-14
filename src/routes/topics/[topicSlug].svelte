@@ -52,7 +52,7 @@
       />
     {:else}
       <Header
-        serviceTitle={`Select ${returnCorrectArticle()} ${topicName} category to explore in ${
+        serviceTitle={`Select ${returnCorrectArticle(topicName)} ${topicName} category to explore in ${
           locationId ? locationName : "England and Wales"
         }`}
       />

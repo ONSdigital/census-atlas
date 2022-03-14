@@ -58,7 +58,9 @@
       />
     {:else}
       <Header
-        serviceTitle={`Select a ${topicName} category to explore in ${locationId ? locationName : "England and Wales"}`}
+        serviceTitle={`Select ${returnCorrectArticle(topicName)} ${topicName} category to explore in ${
+          locationId ? locationName : "England and Wales"
+        }`}
       />
     {/if}
   </span>
