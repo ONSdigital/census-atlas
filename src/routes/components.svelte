@@ -86,14 +86,6 @@
     />
   </DesignSystemPanel>
 
-  <DesignSystemPanel title="By category header" code={`<DataHeader tableName="General Health"/>`}>
-    <DataHeader tableName="General Health" />
-  </DesignSystemPanel>
-
-  <DesignSystemPanel title="By location header" code={`<DataHeader location={mapLocation}/>`}>
-    <DataHeader location={mapLocation} />
-  </DesignSystemPanel>
-
   <DesignSystemPanel
     title="Choose a category header"
     code={`<Header
