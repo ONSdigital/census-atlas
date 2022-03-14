@@ -10,6 +10,8 @@
   import { censusTableStructureIsLoaded } from "../../model/censusdata/censusdata";
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
+  import { returnCorrectArticle } from "../../utils";
+
   import ChangeLocation from "../../ui/ChangeLocation/ChangeLocation.svelte";
   let locationId = $page.query.get("location");
   let locationName, header;
@@ -33,13 +35,6 @@
     }
   }
   let topicName = topicSlug.replace("-", " ");
-  function returnCorrectArticle() {
-    if (/[aeiouAEIOU]/.test(topicName.charAt(0))) {
-      return "an";
-    } else {
-      return "a";
-    }
-  }
 </script>
 
 <svelte:window />
@@ -57,7 +52,7 @@
       />
     {:else}
       <Header
-        serviceTitle={`Select ${returnCorrectArticle()} ${topicName} category to explore in ${
+        serviceTitle={`Select ${returnCorrectArticle(topicName)} ${topicName} category to explore in ${
           locationId ? locationName : "England and Wales"
         }`}
       />
