@@ -10,7 +10,10 @@
   let renderError = false;
   let invertTextColor = true;
 
-  $: href = $page.path;
+  $: href = `${$page.path}/`;
+  $: {
+    console.log(href);
+  }
 
   function submitFunction(ladInput, baseUrl) {
     if (reverseLadLookup[ladInput]) {
@@ -60,8 +63,15 @@
     />
     {#if locationId}
       <div class="all-link">
+        <span>{href}</span>
         <p>
-          <a {href} on:click={onClose}>See data for all England and Wales</a>
+          <a
+            {href}
+            on:click={() => {
+              updateSelectedGeography("");
+              onClose();
+            }}>See data for all England and Wales</a
+          >
         </p>
       </div>
     {/if}

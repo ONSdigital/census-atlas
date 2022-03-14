@@ -22,23 +22,31 @@
   import ONSEmailIcon from "../ui/ons/svg/ONSEmailIcon.svelte";
   import ExploreSomethingElseNav from "../ui/ExploreSomethingElseNav/ExploreSomethingElseNav.svelte";
   import Feedback from "../ui/Feedback.svelte";
-  import HeaderWrapper from "../ui/HeaderWrapper.svelte";
+  import Header from "../ui/Header.svelte";
+  import ChangeLocation from "../ui/ChangeLocation/ChangeLocation.svelte";
   import { topicSuggestions } from "../config";
   import slugify from "slugify";
   import { page } from "$app/stores";
-  import { getLadName, selectedGeography } from "../model/geography/geography";
+  import { getLadName, updateSelectedGeography, selectedGeography } from "../model/geography/geography";
+  import { goto } from "$app/navigation";
 
   export let topicSlug;
   let pageTopic = {};
-  let showChangeAreaHeader = false;
-  let header;
-  let locationId = $page.query.get("location");
-  let locationName = locationId ? getLadName($page.query.get("location")) : "England and Wales";
+  let showChangeLocation = false;
+  let locationName, locationId, header;
+
+  $: {
+    locationId = $page.query.get("location");
+    updateSelectedGeography(locationId);
+    locationName = getLadName(locationId) ? getLadName(locationId) : "England and Wales";
+  }
 
   $: {
     if ($selectedGeography.lad) {
+      $page.query.set("location", $selectedGeography.lad);
+      goto(`?${$page.query.toString()}`);
       locationId = $page.query.get("location");
-      locationName = getLadName($page.query.get("location"));
+      locationName = getLadName(locationId);
     }
   }
 
@@ -55,12 +63,15 @@
 
 <BasePage>
   <span slot="header" bind:this={header}>
-    <HeaderWrapper
-      serviceTitle={pageTopic.topicName}
-      description={locationName}
-      bind:showChangeAreaHeader
-      changeAreaBaseUrl="/{topicSlug}"
-    />
+    {#if showChangeLocation}
+      <ChangeLocation
+        {locationId}
+        changeAreaBaseUrl="/{topicSlug}"
+        onClose={() => (showChangeLocation = !showChangeLocation)}
+      />
+    {:else}
+      <Header serviceTitle={pageTopic.topicName} description={`In ${locationName}`} />
+    {/if}
   </span>
 
   <span slot="map">
@@ -99,7 +110,7 @@
     <ExploreSomethingElseNav
       firstLink={{ text: "New topic", url: locationId ? `/topics?location=${locationId}` : "/topics" }}
       secondLink={{ text: locationId ? "New location" : "Choose location", url: "" }}
-      on:click={() => ((showChangeAreaHeader = true), header.scrollIntoView())}
+      on:click={() => ((showChangeLocation = true), header.scrollIntoView())}
     />
   </div>
 </BasePage>
