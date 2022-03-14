@@ -2,7 +2,8 @@
   import BasePage from "../../../../ui/BasePage.svelte";
   import ExploreSomethingElseNav from "../../../../ui/ExploreSomethingElseNav/ExploreSomethingElseNav.svelte";
   import Return from "../../../../ui/Return.svelte";
-  import HeaderWrapper from "../../../../ui/HeaderWrapper.svelte";
+  import ChangeLocation from "../../../../ui/ChangeLocation/ChangeLocation.svelte";
+  import Header from "../../../../ui/Header.svelte";
   import MapWrapper from "../../../../ui/map/MapWrapper.svelte";
   import TopicExplorer from "../../../../ui/TopicExplorer.svelte";
   import Feedback from "../../../../ui/Feedback.svelte";
@@ -15,7 +16,7 @@
   let { topicSlug, tableSlug, categorySlug } = $page.params;
   let locationId = $page.query.get("location");
   let locationName, header;
-  let showChangeAreaHeader = false;
+  let showChangeLocation = false;
   $: category = getCategoryBySlug(tableSlug, categorySlug);
   $: {
     locationId = $page.query.get("location");
@@ -48,15 +49,17 @@
     {/if}
   </span>
   <span slot="header" bind:this={header}>
-    <HeaderWrapper
-      {locationName}
-      {locationId}
-      {topicSlug}
-      changeAreaBaseUrl="/topics/{topicSlug}/{tableSlug}/{categorySlug}"
-      bind:showChangeAreaHeader
-      serviceTitle={`Select a ${topicName} category to explore in ${locationId ? locationName : "England and Wales"}`}
-      renderEnglandWalesData={false}
-    />
+    {#if showChangeLocation}
+      <ChangeLocation
+        {locationId}
+        changeAreaBaseUrl="/topics/{topicSlug}/{tableSlug}/{categorySlug}"
+        onClose={() => (showChangeLocation = !showChangeLocation)}
+      />
+    {:else}
+      <Header
+        serviceTitle={`Select a ${topicName} category to explore in ${locationId ? locationName : "England and Wales"}`}
+      />
+    {/if}
   </span>
 
   <span slot="map">
@@ -75,7 +78,7 @@
     <ExploreSomethingElseNav
       firstLink={{ text: "New topic", url: locationId ? `/topics?location=${locationId}` : "/topics" }}
       secondLink={{ text: locationId ? "New location" : "Choose location", url: "" }}
-      on:click={() => ((showChangeAreaHeader = true), header.scrollIntoView())}
+      on:click={() => ((showChangeLocation = true), header.scrollIntoView())}
     />
   </div>
 

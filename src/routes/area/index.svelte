@@ -6,7 +6,8 @@
   import ONSShare from "../../ui/ons/ONSShare.svelte";
   import UseCensusData from "../../ui/UseCensusData.svelte";
   import Feedback from "../../ui/Feedback.svelte";
-  import HeaderWrapper from "../../ui/HeaderWrapper.svelte";
+  import Header from "../../ui/Header.svelte";
+  import ChangeLocation from "../../ui/ChangeLocation/ChangeLocation.svelte";
   import ONSShareItem from "../../ui/ons/partials/ONSShareItem.svelte";
   import ONSFacebookIcon from "../../ui/ons/svg/ONSFacebookIcon.svelte";
   import ONSTwitterIcon from "../../ui/ons/svg/ONSTwitterIcon.svelte";
@@ -40,7 +41,7 @@
   let housingTable;
   let peopleTable;
   let retries = 0;
-  let showChangeAreaHeader = false;
+  let showChangeLocation = false;
 
   onMount(async () => {
     $pageUrl = "";
@@ -115,13 +116,15 @@
 
 <BasePage>
   <span slot="header" bind:this={header}>
-    <HeaderWrapper
-      serviceTitle={locationName}
-      {locationId}
-      bind:showChangeAreaHeader
-      changeAreaBaseUrl="/area"
-      renderEnglandWalesData={false}
-    />
+    {#if showChangeLocation}
+      <ChangeLocation
+        {locationId}
+        changeAreaBaseUrl="/area"
+        onClose={() => (showChangeLocation = !showChangeLocation)}
+      />
+    {:else}
+      <Header serviceTitle={locationName} />
+    {/if}
   </span>
 
   <span slot="map">
@@ -167,7 +170,7 @@
     <ExploreSomethingElseNav
       firstLink={{ text: "Choose a topic", url: locationId ? `/topics?location=${locationId}` : "/topics" }}
       secondLink={{ text: locationId ? "New location" : "Choose location", url: "" }}
-      on:click={() => ((showChangeAreaHeader = true), header.scrollIntoView())}
+      on:click={() => ((showChangeLocation = true), header.scrollIntoView())}
     />
   </div>
 
