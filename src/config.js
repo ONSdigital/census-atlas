@@ -100,7 +100,8 @@ export default {
   error: {
     text: "You must enter the name of the local council or city.",
   },
-  autosuggestData: "https://raw.githubusercontent.com/ONSdigital/census-atlas/master/src/data/ladList.json",
+  autosuggestData:
+    "https://raw.githubusercontent.com/ONSdigital/census-atlas/master/src/data/autosuggest/ladAndMsoaList.json",
   eAndWGeoCode: "K04000001",
   suggestions: {
     indexPageSuggestions: [
