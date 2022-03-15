@@ -178,3 +178,11 @@ function strToSentenceComponent(str) {
   }
   return outStr;
 }
+
+export function returnCorrectArticle(topicName) {
+  if (/[aeiouAEIOU]/.test(topicName.charAt(0))) {
+    return "an";
+  } else {
+    return "a";
+  }
+}
