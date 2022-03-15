@@ -70,7 +70,7 @@
   </span>
 
   <div class="ons-u-mb-xl">
-    <TopicList />
+    <TopicList {locationId} />
   </div>
 
   <span slot="map">
