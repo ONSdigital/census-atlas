@@ -20,13 +20,21 @@
 
   $: {
     locationId = $page.query.get("location");
+    updateSelectedGeography(locationId);
+    locationName = getLadName(locationId) ? getLadName(locationId) : "England and Wales";
+  }
+
+  $: {
     if ($selectedGeography.lad) {
-      $page.query.set("location", $selectedGeography.lad);
-      goto(`?${$page.query.toString()}`);
-      locationId = $page.query.get("location");
-      locationName = getLadName(locationId);
+      if ($selectedGeography.lad != locationId) {
+        $page.query.set("location", $selectedGeography.lad);
+        goto(`?${$page.query.toString()}`);
+        locationId = $page.query.get("location");
+        locationName = getLadName(locationId);
+      }
     }
   }
+
   $: appIsInitialised, $appIsInitialised && initialisePage();
   function initialisePage() {
     if (locationId) {
