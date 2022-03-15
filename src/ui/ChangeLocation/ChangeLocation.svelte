@@ -10,12 +10,12 @@
   let renderError = false;
   let invertTextColor = true;
 
+  $: locationQueryParam = locationId ? `?location=${locationId}` : "";
   $: href = $page.path;
 
   function submitFunction(ladInput, baseUrl) {
     if (reverseLadLookup[ladInput]) {
       goto(`${baseUrl}?location=${reverseLadLookup[ladInput]}`);
-      updateSelectedGeography(reverseLadLookup[ladInput]);
       onClose();
     } else {
       renderError = true;
@@ -27,7 +27,7 @@
 <div class={`ons-grid ons-grid--flex change-container ${isMobile ? "mobile" : ""}`}>
   <div class="ons-container">
     <div class="close-button">
-      <a class="close-link" {href} id="close" on:click={onClose}>Close </a>
+      <a class="close-link" href={href + locationQueryParam} id="close" on:click={onClose}>Close </a>
       <svg
         class="ons-svg-icon"
         width="19"

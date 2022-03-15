@@ -1,11 +1,13 @@
 <script>
   import ONSCard from "./ons/ONSCard.svelte";
-  import metadata from "../data/apiMetadata.js";
+  import { censusMetadata } from "../model/metadata/metadata";
+  export let locationId;
+  $: locationQueryParam = locationId ? `?location=${locationId}` : "";
 </script>
 
-{#each metadata as topic, i}
-  <ONSCard title={topic.name} href="topics/{topic.slug}" id="topic-{i}">{topic.desc}</ONSCard>
-  {#if i < metadata.length - 1}
+{#each $censusMetadata as topic, i}
+  <ONSCard title={topic.name} href="topics/{topic.slug}{locationQueryParam}" id="topic-{i}">{topic.desc}</ONSCard>
+  {#if i < $censusMetadata.length - 1}
     <hr class="component-margin--2" />
   {/if}
 {/each}
