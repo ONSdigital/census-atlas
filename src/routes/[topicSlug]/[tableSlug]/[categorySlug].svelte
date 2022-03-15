@@ -214,7 +214,13 @@
 
   {#if showCategorySelector}
     {#if showChangeLocation}
-      <ChangeLocation {locationId} {categorySlug} onClose={() => (showChangeLocation = !showChangeLocation)} isMobile />
+      <ChangeLocation
+        {locationId}
+        {categorySlug}
+        changeAreaBaseUrl="/{topicSlug}/{tableSlug}/{categorySlug}"
+        onClose={() => (showChangeLocation = !showChangeLocation)}
+        isMobile
+      />
     {:else}
       <CategorySelector
         tableName={table ? table.name : null}
